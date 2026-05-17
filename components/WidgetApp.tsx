@@ -20,6 +20,21 @@ const STEPS = [
   "Compiling the autopsy",
 ];
 
+const SAMPLES: Array<{ label: string; data: AutopsyInput }> = [
+  {
+    label: "DeFi protocol",
+    data: { companyName: "Vaultline", websiteUrl: "vaultline.xyz", twitterHandle: "vaultline", category: "DeFi" },
+  },
+  {
+    label: "AI infra startup",
+    data: { companyName: "Agentframe", websiteUrl: "agentframe.ai", twitterHandle: "agentframe", category: "AI infra" },
+  },
+  {
+    label: "Devtool",
+    data: { companyName: "Mergewell", websiteUrl: "mergewell.dev", twitterHandle: "mergewell", category: "devtool" },
+  },
+];
+
 const BINARY_NOISE = ["00 0 01", "0 10 01", "0 01 00 0", "1 00 10 1", "00 1 010"];
 
 type Phase = "idle" | "loading" | "done";
@@ -41,6 +56,8 @@ export function WidgetApp({
   const [websiteUrl, setWebsiteUrl] = useState("");
   const [twitterHandle, setTwitterHandle] = useState("");
   const [category, setCategory] = useState<Category>("AI infra");
+  const [competitorUrl, setCompetitorUrl] = useState("");
+  const [competitorHandle, setCompetitorHandle] = useState("");
 
   useEffect(() => {
     if (phase !== "loading") return;
@@ -61,6 +78,8 @@ export function WidgetApp({
       websiteUrl: websiteUrl.trim(),
       twitterHandle: twitterHandle.trim().replace(/^@/, "") || undefined,
       category,
+      competitorUrl: competitorUrl.trim() || undefined,
+      competitorHandle: competitorHandle.trim().replace(/^@/, "") || undefined,
     };
     setError(null);
     setPhase("loading");
@@ -96,11 +115,13 @@ export function WidgetApp({
     setTimeout(() => setPhase("done"), 250);
   }
 
-  function fillSample() {
-    setCompanyName("Vaultline");
-    setWebsiteUrl("vaultline.xyz");
-    setTwitterHandle("vaultline");
-    setCategory("DeFi");
+  function fillSample(s: AutopsyInput) {
+    setCompanyName(s.companyName);
+    setWebsiteUrl(s.websiteUrl);
+    setTwitterHandle(s.twitterHandle ?? "");
+    setCategory(s.category);
+    setCompetitorUrl("");
+    setCompetitorHandle("");
   }
 
   function reset() {
@@ -136,6 +157,10 @@ export function WidgetApp({
             setTwitterHandle={setTwitterHandle}
             category={category}
             setCategory={setCategory}
+            competitorUrl={competitorUrl}
+            setCompetitorUrl={setCompetitorUrl}
+            competitorHandle={competitorHandle}
+            setCompetitorHandle={setCompetitorHandle}
             onSubmit={submit}
             onSample={fillSample}
             error={error}
@@ -368,6 +393,17 @@ export function WidgetApp({
           letter-spacing: 0.1em;
           text-transform: uppercase;
         }
+        .myo-grid-2 {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 22px;
+        }
+        @media (max-width: 520px) {
+          .myo-grid-2 {
+            grid-template-columns: 1fr;
+            gap: 18px;
+          }
+        }
         @keyframes myoShimmer {
           0% { background-position: -200% 0; }
           100% { background-position: 200% 0; }
@@ -401,8 +437,12 @@ function IdleScreen(props: {
   setTwitterHandle: (s: string) => void;
   category: Category;
   setCategory: (c: Category) => void;
+  competitorUrl: string;
+  setCompetitorUrl: (s: string) => void;
+  competitorHandle: string;
+  setCompetitorHandle: (s: string) => void;
   onSubmit: (e: React.FormEvent) => void;
-  onSample: () => void;
+  onSample: (s: AutopsyInput) => void;
   error: string | null;
 }) {
   return (
@@ -410,7 +450,7 @@ function IdleScreen(props: {
       <div style={{ fontFamily: "var(--font-mono-stack)", fontSize: 10, letterSpacing: "0.18em", color: "rgba(255,255,255,0.45)", textTransform: "uppercase", marginBottom: 14 }}>
         / FREE DIAGNOSTIC · 60 SECONDS
       </div>
-      <h2 className="myo-display">
+      <h2 className="myo-display" style={{ fontSize: 40 }}>
         Stop sounding<br />
         like the <em>category.</em>
       </h2>
@@ -418,18 +458,20 @@ function IdleScreen(props: {
         Three HiveMind personas read your homepage, X, and category. They diagnose what's broken, find your wedge, and rewrite your hero. Brutally honest. Free.
       </p>
 
-      <form onSubmit={props.onSubmit} style={{ display: "flex", flexDirection: "column", gap: 18 }}>
-        <div>
-          <div className="myo-label">/ Company</div>
-          <input className="myo-input" placeholder="Vaultline" value={props.companyName} onChange={e => props.setCompanyName(e.target.value)} maxLength={80} required />
-        </div>
-        <div>
-          <div className="myo-label">/ Website</div>
-          <input className="myo-input" placeholder="vaultline.xyz" value={props.websiteUrl} onChange={e => props.setWebsiteUrl(e.target.value)} maxLength={200} required />
-        </div>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18 }}>
+      <form onSubmit={props.onSubmit} style={{ display: "flex", flexDirection: "column", gap: 22 }}>
+        <div className="myo-grid-2">
           <div>
-            <div className="myo-label">/ X handle (opt)</div>
+            <div className="myo-label">/ Company</div>
+            <input className="myo-input" placeholder="Vaultline" value={props.companyName} onChange={e => props.setCompanyName(e.target.value)} maxLength={80} required />
+          </div>
+          <div>
+            <div className="myo-label">/ Website</div>
+            <input className="myo-input" placeholder="vaultline.xyz" value={props.websiteUrl} onChange={e => props.setWebsiteUrl(e.target.value)} maxLength={200} required />
+          </div>
+        </div>
+        <div className="myo-grid-2">
+          <div>
+            <div className="myo-label">/ X handle (optional)</div>
             <input className="myo-input" placeholder="vaultline" value={props.twitterHandle} onChange={e => props.setTwitterHandle(e.target.value)} maxLength={40} />
           </div>
           <div>
@@ -439,6 +481,16 @@ function IdleScreen(props: {
             </select>
           </div>
         </div>
+        <div className="myo-grid-2">
+          <div>
+            <div className="myo-label">/ Competitor URL (optional)</div>
+            <input className="myo-input" placeholder="optional" value={props.competitorUrl} onChange={e => props.setCompetitorUrl(e.target.value)} maxLength={200} />
+          </div>
+          <div>
+            <div className="myo-label">/ Competitor handle (optional)</div>
+            <input className="myo-input" placeholder="optional" value={props.competitorHandle} onChange={e => props.setCompetitorHandle(e.target.value)} maxLength={40} />
+          </div>
+        </div>
 
         {props.error && (
           <div style={{ fontFamily: "var(--font-mono-stack)", fontSize: 11, color: "#FF2A38", padding: "8px 0", borderTop: "1px solid rgba(255,42,56,0.4)", borderBottom: "1px solid rgba(255,42,56,0.4)", letterSpacing: "0.08em", textTransform: "uppercase" }}>
@@ -446,9 +498,28 @@ function IdleScreen(props: {
           </div>
         )}
 
-        <div style={{ display: "flex", flexDirection: "column", gap: 10, marginTop: 4 }}>
-          <button type="submit" className="myo-btn-primary">RUN AUTOPSY →</button>
-          <button type="button" onClick={props.onSample} className="myo-btn-ghost">/ Try a sample</button>
+        <div style={{ height: 1, background: "rgba(255,255,255,0.1)", marginTop: 4 }} />
+
+        <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
+          <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 8 }}>
+            <span style={{ fontFamily: "var(--font-mono-stack)", fontSize: 10, letterSpacing: "0.14em", color: "rgba(255,255,255,0.4)", textTransform: "uppercase", marginRight: 4 }}>
+              SAMPLES:
+            </span>
+            {SAMPLES.map(s => (
+              <button
+                key={s.label}
+                type="button"
+                onClick={() => props.onSample(s.data)}
+                className="myo-btn-ghost"
+                style={{ width: "auto", padding: "8px 14px" }}
+              >
+                {s.label}
+              </button>
+            ))}
+          </div>
+          <button type="submit" className="myo-btn-primary" style={{ width: "auto", paddingLeft: 26, paddingRight: 26 }}>
+            RUN AUTOPSY →
+          </button>
         </div>
       </form>
 
