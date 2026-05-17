@@ -141,6 +141,44 @@ Create a new **Custom HTML** tag, paste the `<script>` tag, set the trigger to *
 
 ---
 
+## Inline embed (alternative to popup)
+
+Use this when you want the widget rendered **directly into a section of the page** instead of behind a launcher button. Visitors see the form immediately, no click required.
+
+Drop this `<iframe>` wherever you want the widget to appear:
+
+```html
+<iframe
+  src="https://gtm-autopsy.vercel.app/widget?cta=https%3A%2F%2Fmyosin.xyz%2Fhivemind%23contact&label=Hire%20HiveMind"
+  style="width:100%; max-width:760px; height:880px; border:0; border-radius:18px; display:block; margin:0 auto;"
+  allow="clipboard-write"
+  title="GTM Autopsy by HiveMind"
+></iframe>
+```
+
+### Framer specifics
+
+In Framer, add an **Embed** element at the position you want. Set its mode to **HTML** and paste the snippet above. Set the element height in the right-hand panel to **880px** so Framer reserves the right vertical space.
+
+### Popup vs inline — pick one or both
+
+| Mode | Best for |
+|---|---|
+| **Popup** (`<script src=".../embed.js">`) | Site-wide launcher with low visual weight. Pricing pages, blog list, navigation. Doesn't disrupt the page layout. |
+| **Inline** (`<iframe src=".../widget">`) | A specific section of `/hivemind` where you want the widget to be the main attraction. Highest conversion for that page. |
+
+They don't conflict — ship the popup site-wide for ambient access, and embed inline on `/hivemind` itself as the hero conversion surface.
+
+### Sizing
+
+Default `760×880` matches the popup modal. Tweak in the `style` attribute:
+
+- Narrow column: `max-width: 520px`
+- Full-width banner: remove `max-width`, set `height: 720px`
+- Mobile-only fixed height: `height: clamp(700px, 100vh - 40px, 880px)`
+
+---
+
 ## Test on the real site first
 
 Two ways to preview before deploying. Both take under 30 seconds.

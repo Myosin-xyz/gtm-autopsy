@@ -20,6 +20,13 @@ s.src='https://gtm-autopsy.vercel.app/embed.js';
 s.defer=true;
 document.body.appendChild(s);`;
 
+const INLINE_SNIPPET = `<iframe
+  src="https://gtm-autopsy.vercel.app/widget?cta=https%3A%2F%2Fmyosin.xyz%2Fhivemind%23contact&label=Hire%20HiveMind"
+  style="width:100%; max-width:760px; height:880px; border:0; border-radius:18px; display:block; margin:0 auto;"
+  allow="clipboard-write"
+  title="GTM Autopsy by HiveMind"
+></iframe>`;
+
 const CONFIG_ROWS = [
   { attr: "data-label", default: "Run a free GTM Autopsy", desc: "Text on the launcher pill." },
   { attr: "data-position", default: "bottom-right", desc: "bottom-right · bottom-left · top-right · top-left" },
@@ -96,7 +103,7 @@ window.GTMAutopsy.isOpen();   // → boolean`}
 
         <Divider />
 
-        <Section label="/ 04 · Where it goes" title="Pick whichever fits your stack.">
+        <Section label="/ 04 · Where it goes (popup mode)" title="Pick whichever fits your stack.">
           <div className="grid gap-4 md:grid-cols-2">
             <InstallCard
               num="01"
@@ -124,7 +131,68 @@ window.GTMAutopsy.isOpen();   // → boolean`}
         <Divider />
 
         <Section
-          label="/ 05 · Test on the real site first"
+          label="/ 05 · Inline embed (alternative to popup)"
+          title="Render the widget inline as part of the page."
+        >
+          <p className="text-sm leading-relaxed text-white/70" style={{ marginTop: -4 }}>
+            Instead of a floating launcher button, drop the widget directly into a section of the page using a single <span className="kbd">{`<iframe>`}</span>. Same widget, same logic, but it lives inside the page flow — visitors don't have to click anything to start a teardown.
+          </p>
+          <div className="mt-6">
+            <CodeBlock code={INLINE_SNIPPET} />
+          </div>
+
+          <div
+            style={{
+              marginTop: 22,
+              padding: 16,
+              borderLeft: "3px solid #FFFF6A",
+              background: "rgba(255,255,106,0.05)",
+            }}
+          >
+            <div
+              style={{
+                fontFamily: "var(--font-mono-stack)",
+                fontSize: 10.5,
+                fontWeight: 700,
+                letterSpacing: "0.12em",
+                textTransform: "uppercase",
+                color: "#FFFF6A",
+                marginBottom: 8,
+              }}
+            >
+              / Framer specifics
+            </div>
+            <div style={{ fontSize: 13.5, color: "rgba(255,255,255,0.85)", lineHeight: 1.65 }}>
+              In Framer, add an <strong>Embed</strong> element where you want the widget. Choose <em style={{ fontStyle: "normal", color: "#FFFF6A" }}>HTML</em> mode and paste the snippet above. Set the element height to <span className="kbd">880px</span> (matching the iframe height) so Framer reserves the right vertical space.
+            </div>
+          </div>
+
+          <p className="text-sm leading-relaxed text-white/65 mt-5">
+            Tweak <span className="kbd">max-width</span>, <span className="kbd">height</span>, and <span className="kbd">border-radius</span> in the <span className="kbd">style</span> attribute to fit your section. Default sizing (760×880, 18px corners) matches the popup modal.
+          </p>
+
+          <div className="mt-4 grid gap-3 md:grid-cols-2">
+            <InstallCard
+              num="A"
+              title="Use inline when…"
+              body="You want a permanent on-page section that converts without a click. Best for landing pages, blog posts in the topic, the hero of /hivemind itself."
+            />
+            <InstallCard
+              num="B"
+              title="Use popup when…"
+              body="You want low visual weight on every page, with a floating launcher that doesn't disrupt the layout. Best for product pages, pricing, blog list."
+            />
+          </div>
+
+          <p className="text-sm leading-relaxed text-white/55 mt-5">
+            You can ship both — popup launcher site-wide + an inline embed on the hero section of <span className="kbd">/hivemind</span>. They don't conflict.
+          </p>
+        </Section>
+
+        <Divider />
+
+        <Section
+          label="/ 06 · Test on the real site first"
           title="Two ways to preview before you deploy."
         >
           <p className="text-sm leading-relaxed text-white/65" style={{ marginTop: -4 }}>
@@ -316,7 +384,7 @@ window.GTMAutopsy.isOpen();   // → boolean`}
 
         <Divider />
 
-        <Section label="/ 06 · CSP" title="If you run a Content Security Policy.">
+        <Section label="/ 07 · CSP" title="If you run a Content Security Policy.">
           <CodeBlock
             code={`script-src 'self' https://gtm-autopsy.vercel.app;
 frame-src  https://gtm-autopsy.vercel.app;
