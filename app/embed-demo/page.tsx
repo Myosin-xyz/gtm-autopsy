@@ -7,184 +7,451 @@ export default function EmbedDemoPage() {
     <div
       style={{
         minHeight: "100vh",
-        background:
-          "radial-gradient(900px 600px at 50% -10%, rgba(139,92,246,0.18), transparent 60%), #0a0a10",
-        color: "#eceef5",
+        background: "#000",
+        color: "#fff",
         fontFamily:
-          'ui-sans-serif, system-ui, -apple-system, Inter, "Helvetica Neue", Arial',
+          '"IBM Plex Sans", ui-sans-serif, system-ui, -apple-system, Inter, "Helvetica Neue", Arial',
+        letterSpacing: "-0.005em",
+        position: "relative",
+        overflow: "hidden",
       }}
     >
+      <link
+        rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap"
+      />
+
       <div
         style={{
-          maxWidth: 960,
-          margin: "0 auto",
-          padding: "80px 24px 160px",
+          position: "fixed",
+          inset: 0,
+          backgroundImage:
+            "linear-gradient(to right, rgba(255,255,255,0.03) 1px, transparent 1px),linear-gradient(to bottom, rgba(255,255,255,0.03) 1px, transparent 1px)",
+          backgroundSize: "80px 80px",
+          pointerEvents: "none",
+          zIndex: 0,
+        }}
+      />
+
+      <nav
+        style={{
+          position: "sticky",
+          top: 0,
+          zIndex: 10,
+          background: "rgba(0,0,0,0.85)",
+          backdropFilter: "blur(8px)",
+          borderBottom: "1px solid rgba(255,255,255,0.18)",
         }}
       >
         <div
           style={{
+            maxWidth: 1200,
+            margin: "0 auto",
+            padding: "16px 28px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <Asterisk size={16} color="#FFFF6A" />
+            <span
+              style={{
+                fontFamily: '"IBM Plex Mono", "Courier New", monospace',
+                fontSize: 11,
+                fontWeight: 700,
+                letterSpacing: "0.14em",
+                color: "#FFFF6A",
+              }}
+            >
+              MYOSIN
+            </span>
+            <span
+              style={{
+                color: "rgba(255,255,255,0.25)",
+                fontFamily: '"IBM Plex Mono", "Courier New", monospace',
+                fontSize: 11,
+              }}
+            >
+              /
+            </span>
+            <span
+              style={{
+                fontFamily: '"IBM Plex Mono", "Courier New", monospace',
+                fontSize: 11,
+                fontWeight: 500,
+                letterSpacing: "0.12em",
+                color: "#fff",
+              }}
+            >
+              HIVEMIND
+            </span>
+          </div>
+          <div
+            style={{
+              display: "flex",
+              gap: 22,
+              fontFamily: '"IBM Plex Mono", "Courier New", monospace',
+              fontSize: 11,
+              fontWeight: 500,
+              letterSpacing: "0.12em",
+              textTransform: "uppercase",
+              color: "rgba(255,255,255,0.7)",
+            }}
+          >
+            <span>Product</span>
+            <span>Frameworks</span>
+            <span>Pricing</span>
+            <span>Contact</span>
+          </div>
+        </div>
+      </nav>
+
+      <section
+        style={{
+          position: "relative",
+          zIndex: 1,
+          maxWidth: 1200,
+          margin: "0 auto",
+          padding: "96px 28px 80px",
+        }}
+      >
+        <div
+          style={{
+            fontFamily: '"IBM Plex Mono", "Courier New", monospace',
             fontSize: 11,
             letterSpacing: "0.18em",
             textTransform: "uppercase",
             color: "rgba(255,255,255,0.5)",
+            marginBottom: 28,
           }}
         >
-          Demo · simulating myosin.xyz/hivemind
+          / DEMO · SIMULATING MYOSIN.XYZ/HIVEMIND
         </div>
         <h1
           style={{
-            fontSize: 56,
-            lineHeight: 1.05,
+            fontFamily: '"IBM Plex Mono", "Courier New", monospace',
+            fontSize: "clamp(48px, 9vw, 112px)",
+            lineHeight: 0.93,
             letterSpacing: "-0.02em",
-            margin: "16px 0 18px",
-            fontWeight: 600,
+            margin: 0,
+            fontWeight: 700,
+            textTransform: "uppercase",
+            maxWidth: 1100,
           }}
         >
-          Hivemind makes go-to-market{" "}
-          <span
-            style={{
-              background: "linear-gradient(90deg,#8B5CF6,#22D3EE)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-            }}
-          >
-            legible
-          </span>
-          .
+          Elite strategic
+          <br />
+          thinking,{" "}
+          <span style={{ color: "#FFFF6A" }}>on demand.</span>
         </h1>
         <p
           style={{
-            fontSize: 18,
-            lineHeight: 1.5,
+            fontSize: 19,
+            lineHeight: 1.55,
             color: "rgba(255,255,255,0.7)",
-            maxWidth: 640,
+            maxWidth: 660,
+            marginTop: 32,
           }}
         >
-          We diagnose, sharpen, and rewrite the GTM systems of the most ambitious
-          Web3 and AI companies. Look in the corner — that floating button is the
-          GTM Autopsy widget you can paste on any site.
+          Strategic firepower from Myosin's top marketing minds — compressed into
+          one AI. HiveMind diagnoses, sharpens, and rewrites the go-to-market of
+          the most ambitious Web3 and AI teams.
         </p>
 
-        <div
-          style={{
-            display: "flex",
-            gap: 12,
-            marginTop: 28,
-            flexWrap: "wrap",
-          }}
-        >
-          <a
-            href="#"
-            onClick={e => {
-              e.preventDefault();
-              if (typeof window !== "undefined" && (window as unknown as { GTMAutopsy?: { open: () => void } }).GTMAutopsy) {
-                (window as unknown as { GTMAutopsy: { open: () => void } }).GTMAutopsy.open();
-              }
+        <div style={{ display: "flex", gap: 12, marginTop: 36, flexWrap: "wrap" }}>
+          <button
+            onClick={() => {
+              const w = window as unknown as { GTMAutopsy?: { open: () => void } };
+              if (w.GTMAutopsy) w.GTMAutopsy.open();
             }}
             style={{
-              padding: "12px 18px",
-              borderRadius: 10,
-              background: "linear-gradient(135deg,#8B5CF6,#6d28d9)",
-              color: "white",
-              textDecoration: "none",
-              fontWeight: 600,
-              border: "1px solid rgba(255,255,255,0.12)",
+              padding: "14px 26px",
+              borderRadius: 999,
+              background: "#FFFF6A",
+              color: "#000",
+              fontFamily: '"IBM Plex Mono", "Courier New", monospace',
+              fontWeight: 700,
+              border: 0,
+              fontSize: 12,
+              letterSpacing: "0.14em",
+              textTransform: "uppercase",
+              cursor: "pointer",
             }}
           >
             Run a free GTM autopsy →
-          </a>
+          </button>
           <a
             href="#how"
             style={{
-              padding: "12px 18px",
-              borderRadius: 10,
-              background: "rgba(255,255,255,0.04)",
-              color: "white",
+              padding: "14px 22px",
+              borderRadius: 999,
+              background: "transparent",
+              color: "#fff",
               textDecoration: "none",
-              border: "1px solid rgba(255,255,255,0.08)",
+              border: "1px solid rgba(255,255,255,0.25)",
+              fontFamily: '"IBM Plex Mono", "Courier New", monospace',
+              fontSize: 11,
+              fontWeight: 500,
+              letterSpacing: "0.12em",
+              textTransform: "uppercase",
             }}
           >
-            How Hivemind works
+            / How Hivemind works
           </a>
         </div>
+
+        <div style={{ marginTop: 32, display: "flex", flexWrap: "wrap", gap: 8 }}>
+          <Chip color="#6989FE" mark="▰">GTM Architect</Chip>
+          <Chip color="#FF29E8" mark="✦">Genius Strategist</Chip>
+          <Chip color="#ACFA52" mark="✎">Ghostwriter</Chip>
+        </div>
+
+        <div style={{ marginTop: 80, height: 1, background: "rgba(255,255,255,0.18)" }} />
 
         <div
           id="how"
           style={{
-            marginTop: 80,
-            padding: 28,
+            marginTop: 64,
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit,minmax(240px,1fr))",
+            gap: 1,
+            background: "rgba(255,255,255,0.1)",
+            border: "1px solid rgba(255,255,255,0.1)",
+            overflow: "hidden",
+          }}
+        >
+          {[
+            { num: "01", label: "GTM Architect", desc: "Structural diagnosis of positioning, ICP, narrative, distribution." },
+            { num: "02", label: "Genius Strategist", desc: "Identifies the wedge phrase the category does not own." },
+            { num: "03", label: "Ghostwriter", desc: "Voice-matched rewrites of hero, X posts, founder LinkedIn, cold DM." },
+          ].map(p => (
+            <div
+              key={p.num}
+              style={{
+                background: "#000",
+                padding: "28px 24px",
+                display: "flex",
+                flexDirection: "column",
+                gap: 8,
+              }}
+            >
+              <div
+                style={{
+                  fontFamily: '"IBM Plex Mono", "Courier New", monospace',
+                  fontSize: 11,
+                  fontWeight: 700,
+                  color: "#FFFF6A",
+                  letterSpacing: "0.14em",
+                }}
+              >
+                {p.num}
+              </div>
+              <div style={{ fontSize: 17, fontWeight: 600, color: "#fff", marginTop: 6 }}>
+                {p.label}
+              </div>
+              <div style={{ fontSize: 13.5, color: "rgba(255,255,255,0.65)", lineHeight: 1.55 }}>
+                {p.desc}
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section
+        id="snippet"
+        style={{
+          position: "relative",
+          zIndex: 1,
+          maxWidth: 1200,
+          margin: "0 auto",
+          padding: "40px 28px 120px",
+        }}
+      >
+        <div
+          style={{
+            padding: 36,
             borderRadius: 18,
-            background: "rgba(19,20,27,0.7)",
-            border: "1px solid rgba(255,255,255,0.06)",
+            background: "rgba(255,255,255,0.015)",
+            border: "1px solid rgba(255,255,255,0.14)",
           }}
         >
           <div
             style={{
+              fontFamily: '"IBM Plex Mono", "Courier New", monospace',
               fontSize: 11,
-              letterSpacing: "0.18em",
+              letterSpacing: "0.14em",
               textTransform: "uppercase",
-              color: "rgba(255,255,255,0.5)",
+              color: "rgba(255,255,255,0.55)",
             }}
           >
-            Drop-in snippet
+            / Drop-in snippet
           </div>
-          <h2 style={{ marginTop: 8, fontSize: 22, fontWeight: 600 }}>
-            One script tag adds the popup to any page
+          <h2
+            style={{
+              fontFamily: '"IBM Plex Mono", "Courier New", monospace',
+              marginTop: 12,
+              fontSize: 32,
+              fontWeight: 700,
+              letterSpacing: "-0.015em",
+              textTransform: "uppercase",
+              lineHeight: 1.05,
+            }}
+          >
+            One <span style={{ color: "#FFFF6A" }}>{`<script>`}</span>{" "}
+            tag adds the popup
+            <br />
+            to any page.
           </h2>
           <pre
             style={{
-              marginTop: 14,
-              padding: 14,
-              background: "#07070b",
-              border: "1px solid rgba(255,255,255,0.08)",
+              marginTop: 22,
+              padding: 20,
+              background: "#000",
+              border: "1px solid rgba(255,255,255,0.12)",
               borderRadius: 10,
               overflow: "auto",
               fontSize: 13,
-              color: "#c9ccdc",
-              lineHeight: 1.55,
+              color: "#bbb",
+              lineHeight: 1.6,
+              fontFamily: '"IBM Plex Mono", "Courier New", monospace',
             }}
           >
 {`<script
-  src="https://your-deploy.vercel.app/embed.js"
-  data-label="Get a free GTM teardown"
+  src="https://gtm-autopsy.vercel.app/embed.js"
+  data-label="Run a free GTM Autopsy"
   data-cta="https://myosin.xyz/hivemind#contact"
-  data-cta-label="Hire Hivemind →"
+  data-cta-label="Hire HiveMind →"
   data-position="bottom-right"
-  data-accent="#8B5CF6"
+  data-accent="#FFFF6A"
   defer
 ></script>`}
           </pre>
           <p
             style={{
-              marginTop: 12,
-              fontSize: 13.5,
-              color: "rgba(255,255,255,0.65)",
-              lineHeight: 1.55,
+              marginTop: 18,
+              fontSize: 14.5,
+              color: "rgba(255,255,255,0.7)",
+              lineHeight: 1.6,
+              maxWidth: 760,
             }}
           >
             The widget is fully isolated inside an iframe. The launcher button is
             the only thing injected into the host page. Configurable via{" "}
-            <code style={{ color: "#d8d2ff" }}>data-*</code> attributes:{" "}
-            <code style={{ color: "#d8d2ff" }}>data-label</code>,{" "}
-            <code style={{ color: "#d8d2ff" }}>data-cta</code>,{" "}
-            <code style={{ color: "#d8d2ff" }}>data-cta-label</code>,{" "}
-            <code style={{ color: "#d8d2ff" }}>data-position</code>{" "}
-            (<em>bottom-right · bottom-left · top-right · top-left</em>),{" "}
-            <code style={{ color: "#d8d2ff" }}>data-accent</code>,{" "}
-            <code style={{ color: "#d8d2ff" }}>data-auto="true"</code> to open on
-            page load.
+            <code
+              style={{
+                color: "#FFFF6A",
+                fontFamily: '"IBM Plex Mono", monospace',
+              }}
+            >
+              data-*
+            </code>{" "}
+            attributes. Call{" "}
+            <code
+              style={{
+                color: "#FFFF6A",
+                fontFamily: '"IBM Plex Mono", monospace',
+              }}
+            >
+              window.GTMAutopsy.open()
+            </code>{" "}
+            from any other CTA on the page to trigger the popup.
           </p>
         </div>
-      </div>
+      </section>
 
-      <Script src="/embed.js"
+      <footer
+        style={{
+          position: "relative",
+          zIndex: 1,
+          borderTop: "1px solid rgba(255,255,255,0.18)",
+        }}
+      >
+        <div
+          style={{
+            maxWidth: 1200,
+            margin: "0 auto",
+            padding: "20px 28px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <span
+            style={{
+              fontFamily: '"IBM Plex Mono", "Courier New", monospace',
+              fontSize: 10,
+              letterSpacing: "0.14em",
+              textTransform: "uppercase",
+              color: "rgba(255,255,255,0.35)",
+            }}
+          >
+            2025 / MYOSIN · HIVEMIND
+          </span>
+          <span
+            style={{
+              fontFamily: '"IBM Plex Mono", "Courier New", monospace',
+              fontSize: 10,
+              letterSpacing: "0.14em",
+              color: "rgba(255,255,255,0.35)",
+            }}
+          >
+            0 01 00 0
+          </span>
+        </div>
+      </footer>
+
+      <Script
+        src="/embed.js"
         strategy="afterInteractive"
-        data-label="Get a free GTM teardown"
+        data-label="Run a free GTM Autopsy"
         data-cta="https://myosin.xyz/hivemind#contact"
-        data-cta-label="Hire Hivemind →"
+        data-cta-label="Hire HiveMind →"
         data-position="bottom-right"
-        data-accent="#8B5CF6"
+        data-accent="#FFFF6A"
       />
     </div>
+  );
+}
+
+function Asterisk({ size = 16, color = "currentColor" }: { size?: number; color?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none" aria-hidden style={{ display: "block" }}>
+      <line x1="16" y1="2" x2="16" y2="30" stroke={color} strokeWidth="1.8" />
+      <line x1="2" y1="16" x2="30" y2="16" stroke={color} strokeWidth="1.8" />
+      <line x1="6" y1="6" x2="26" y2="26" stroke={color} strokeWidth="1.8" />
+      <line x1="26" y1="6" x2="6" y2="26" stroke={color} strokeWidth="1.8" />
+    </svg>
+  );
+}
+
+function Chip({
+  color,
+  mark,
+  children,
+}: {
+  color: string;
+  mark: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <span
+      style={{
+        display: "inline-flex",
+        alignItems: "center",
+        gap: 6,
+        padding: "5px 11px",
+        borderRadius: 999,
+        border: `1px solid ${color}66`,
+        color,
+        fontFamily: '"IBM Plex Mono", "Courier New", monospace',
+        fontSize: 10.5,
+        fontWeight: 700,
+        letterSpacing: "0.1em",
+        textTransform: "uppercase",
+      }}
+    >
+      {mark} {children}
+    </span>
   );
 }

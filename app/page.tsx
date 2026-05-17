@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { Form } from "@/components/Form";
 import { LoadingSequence } from "@/components/LoadingSequence";
 import { Report } from "@/components/Report";
-import { Logo } from "@/components/Logo";
+import { Logo, Asterisk } from "@/components/Logo";
 import type { AutopsyInput, AutopsyReport } from "@/lib/types";
 
 type Phase = "idle" | "loading" | "done";
@@ -72,102 +72,152 @@ export default function HomePage() {
   }
 
   if (phase === "done" && report) {
-    return <Report report={report} onReset={reset} />;
+    return (
+      <>
+        <div className="myo-grid" />
+        <TopBar mode={mode} />
+        <Report report={report} onReset={reset} />
+        <BottomBar />
+      </>
+    );
   }
 
   return (
-    <main className="relative mx-auto max-w-4xl px-5 py-10 md:py-16">
-      <nav className="mb-10 flex items-center justify-between">
-        <a href="/" className="flex items-center gap-2">
-          <Logo />
-          <span className="font-semibold tracking-tight">GTM Autopsy</span>
-          <span className="ml-2 text-xs text-white/40">by Hivemind</span>
+    <>
+      <div className="myo-grid" />
+      <TopBar mode={mode} />
+
+      <main className="relative mx-auto max-w-6xl px-6 py-12 md:px-10 md:py-20">
+        {phase === "idle" && (
+          <>
+            <section className="mb-16 md:mb-20">
+              <div className="annotation mb-6">/ FREE DIAGNOSTIC · 60 SECONDS · BY HIVEMIND</div>
+              <h1 className="display text-[44px] leading-[0.95] md:text-[88px] md:leading-[0.92]">
+                Stop sounding<br />
+                like the <em>category.</em>
+              </h1>
+              <p className="mt-7 max-w-2xl text-lg leading-relaxed text-white/70 md:text-xl">
+                Three HiveMind personas read your homepage, X, and category. They diagnose what's broken, find your wedge, and rewrite your hero. Brutally honest. Free.
+              </p>
+
+              <div className="mt-7 flex flex-wrap items-center gap-2">
+                <span className="chip" style={{ border: "1px solid rgba(105,137,254,0.5)", color: "#6989FE" }}>▰ GTM Architect</span>
+                <span className="chip" style={{ border: "1px solid rgba(255,41,232,0.5)", color: "#FF29E8" }}>✦ Genius Strategist</span>
+                <span className="chip" style={{ border: "1px solid rgba(172,250,82,0.5)", color: "#ACFA52" }}>✎ Ghostwriter</span>
+              </div>
+            </section>
+
+            {error && (
+              <div
+                style={{
+                  fontFamily: "var(--font-mono-stack)",
+                  fontSize: 12,
+                  color: "#FF2A38",
+                  padding: "12px 16px",
+                  borderTop: "1px solid rgba(255,42,56,0.45)",
+                  borderBottom: "1px solid rgba(255,42,56,0.45)",
+                  letterSpacing: "0.1em",
+                  textTransform: "uppercase",
+                  marginBottom: 16,
+                }}
+              >
+                {error === "missing_required_fields"
+                  ? "/ ERROR: Company name, website, and category required"
+                  : `/ ERROR: ${error}`}
+              </div>
+            )}
+
+            <Form onSubmit={handleSubmit} submitting={false} />
+
+            <section className="mt-20">
+              <div className="hairline mb-10" />
+              <div className="annotation mb-6">/ WHY THIS ISN'T GENERIC AI</div>
+              <div className="grid gap-px bg-white/10 overflow-hidden md:grid-cols-3">
+                <Feature
+                  num="01"
+                  title="HiveMind personas, not a chatbot"
+                  body="GTM Architect diagnoses. Genius Strategist finds the wedge. Ghostwriter rewrites. Each persona ships with its own knowledge layer."
+                />
+                <Feature
+                  num="02"
+                  title="Framework-backed, not vibes"
+                  body="Every recommendation cites a HiveMind framework — Narrative Health Audit, Category Design Sprint, Founder-Led Distribution, more."
+                />
+                <Feature
+                  num="03"
+                  title="Shareable in 90 seconds"
+                  body="A polished, link-shareable teardown that lands in a founder's DMs and makes them want the full plan."
+                />
+              </div>
+            </section>
+          </>
+        )}
+
+        {phase === "loading" && (
+          <div className="py-10 md:py-16">
+            <LoadingSequence done={apiDone} />
+          </div>
+        )}
+      </main>
+
+      <BottomBar />
+    </>
+  );
+}
+
+function TopBar({ mode }: { mode: "live" | "mock" | null }) {
+  return (
+    <header className="sticky top-0 z-20 bg-black/85 backdrop-blur">
+      <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4 md:px-10">
+        <a href="/" className="flex items-center gap-3">
+          <Logo className="h-4 w-4" color="#FFFF6A" />
+          <span className="font-mono-myo" style={{ fontFamily: "var(--font-mono-stack)", fontSize: 11, fontWeight: 700, letterSpacing: "0.14em", color: "#FFFF6A" }}>
+            HIVEMIND
+          </span>
+          <span style={{ color: "rgba(255,255,255,0.25)", fontFamily: "var(--font-mono-stack)", fontSize: 11 }}>/</span>
+          <span style={{ fontFamily: "var(--font-mono-stack)", fontSize: 11, fontWeight: 500, letterSpacing: "0.12em", color: "#fff" }}>
+            GTM AUTOPSY
+          </span>
         </a>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-4">
           {mode && (
             <span
               className="chip"
               style={{
-                background:
-                  mode === "live" ? "rgba(163,230,53,0.12)" : "rgba(139,92,246,0.12)",
-                borderColor:
-                  mode === "live" ? "rgba(163,230,53,0.4)" : "rgba(139,92,246,0.4)",
-                color: mode === "live" ? "#d3f4a4" : "#d8d2ff",
+                border: mode === "live" ? "1px solid rgba(255,255,106,0.6)" : "1px solid rgba(255,255,255,0.25)",
+                color: mode === "live" ? "#FFFF6A" : "rgba(255,255,255,0.65)",
               }}
             >
-              <span className="h-1.5 w-1.5 rounded-full bg-current animate-pulseDot" />
-              {mode === "live" ? "Live Hivemind" : "Demo mode"}
+              <span style={{ width: 5, height: 5, borderRadius: 999, background: "currentColor", animation: "pulseDot 1.4s ease-in-out infinite" }} />
+              {mode === "live" ? "Live API" : "Demo mode"}
             </span>
           )}
+          <span className="annotation hidden md:inline">2025 · 00 0 01</span>
         </div>
-      </nav>
-
-      {phase === "idle" && (
-        <>
-          <section className="mb-9 text-center md:mb-12">
-            <span className="chip">A Hivemind product surface</span>
-            <h1 className="mx-auto mt-4 max-w-3xl text-4xl font-semibold leading-[1.05] tracking-tight md:text-6xl">
-              Paste a URL.
-              <br />
-              Get a brutally honest{" "}
-              <span
-                style={{
-                  background: "linear-gradient(90deg,#8B5CF6,#22D3EE)",
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                }}
-              >
-                GTM teardown
-              </span>
-              .
-            </h1>
-            <p className="mx-auto mt-5 max-w-2xl text-lg text-white/65">
-              Positioning, ICP, narrative health, distribution leverage, missing proof — diagnosed in 60 seconds by three Hivemind personas working off the same frameworks library used by leading Web3 and AI teams.
-            </p>
-            <div className="mx-auto mt-6 flex max-w-md flex-wrap items-center justify-center gap-2 text-xs text-white/50">
-              <span className="chip" style={{ background: "rgba(34,211,238,0.1)", borderColor: "rgba(34,211,238,0.35)", color: "#a5edf6" }}>GTM Architect</span>
-              <span className="chip" style={{ background: "rgba(139,92,246,0.1)", borderColor: "rgba(139,92,246,0.35)", color: "#d8d2ff" }}>Genius Strategist</span>
-              <span className="chip" style={{ background: "rgba(163,230,53,0.1)", borderColor: "rgba(163,230,53,0.4)", color: "#d3f4a4" }}>Ghostwriter</span>
-            </div>
-          </section>
-
-          {error && (
-            <div className="mb-4 rounded-xl border border-accent-rose/30 bg-accent-rose/10 px-4 py-3 text-sm text-accent-rose/90">
-              {error === "missing_required_fields"
-                ? "Please fill in company name, website, and category."
-                : `Autopsy failed: ${error}`}
-            </div>
-          )}
-
-          <Form onSubmit={handleSubmit} submitting={false} />
-
-          <section className="mt-10 grid gap-4 md:grid-cols-3">
-            <Feature
-              title="Hivemind personas, not generic AI"
-              body="The GTM Architect diagnoses. The Genius Strategist finds the wedge. The Ghostwriter rewrites. Each persona ships with its own knowledge layer."
-            />
-            <Feature
-              title="Framework-backed, not vibes-based"
-              body="Every recommendation cites the underlying Hivemind framework — Narrative Health Audit, Category Design Sprint, Founder-Led Distribution, and more."
-            />
-            <Feature
-              title="Shareable in 90 seconds"
-              body="A polished, link-shareable teardown that lands in a founder's DMs and makes them want the full plan."
-            />
-          </section>
-        </>
-      )}
-
-      {phase === "loading" && <LoadingSequence done={apiDone} />}
-    </main>
+      </div>
+      <div className="hairline" />
+    </header>
   );
 }
 
-function Feature({ title, body }: { title: string; body: string }) {
+function BottomBar() {
   return (
-    <div className="card p-5">
-      <h3 className="text-sm font-semibold text-white/95">{title}</h3>
-      <p className="mt-2 text-sm leading-relaxed text-white/60">{body}</p>
+    <footer className="relative z-10 mt-24">
+      <div className="hairline" />
+      <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5 md:px-10">
+        <span className="annotation">2025 / MYOSIN · HIVEMIND</span>
+        <span className="annotation">0 01 00 0</span>
+      </div>
+    </footer>
+  );
+}
+
+function Feature({ num, title, body }: { num: string; title: string; body: string }) {
+  return (
+    <div className="bg-black p-6 md:p-7">
+      <div style={{ fontFamily: "var(--font-mono-stack)", fontSize: 11, fontWeight: 700, letterSpacing: "0.14em", color: "#FFFF6A" }}>{num}</div>
+      <h3 className="mt-3 text-base font-semibold text-white">{title}</h3>
+      <p className="mt-2 text-sm leading-relaxed text-white/65">{body}</p>
     </div>
   );
 }

@@ -14,9 +14,22 @@ export function CopyButton({ text, label = "Copy" }: { text: string; label?: str
           setTimeout(() => setCopied(false), 1200);
         } catch {}
       }}
-      className="rounded-md border border-white/10 bg-white/5 px-2.5 py-1 text-xs text-white/70 transition hover:bg-white/10"
+      style={{
+        fontFamily: "var(--font-mono-stack)",
+        fontSize: 10,
+        fontWeight: 700,
+        letterSpacing: "0.12em",
+        textTransform: "uppercase",
+        padding: "5px 10px",
+        borderRadius: 999,
+        border: copied ? "1px solid #FFFF6A" : "1px solid rgba(255,255,255,0.2)",
+        background: copied ? "rgba(255,255,106,0.1)" : "transparent",
+        color: copied ? "#FFFF6A" : "rgba(255,255,255,0.7)",
+        cursor: "pointer",
+        transition: "border-color 120ms ease, color 120ms ease, background 120ms ease",
+      }}
     >
-      {copied ? "Copied ✓" : label}
+      {copied ? "✓ Copied" : label}
     </button>
   );
 }

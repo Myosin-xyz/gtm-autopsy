@@ -7,31 +7,16 @@ const CATEGORIES: Category[] = ["DeFi", "AI infra", "consumer crypto", "devtool"
 
 const SAMPLES: Array<{ label: string; data: AutopsyInput }> = [
   {
-    label: "Try: a DeFi protocol",
-    data: {
-      companyName: "Vaultline",
-      websiteUrl: "vaultline.xyz",
-      twitterHandle: "vaultline",
-      category: "DeFi",
-    },
+    label: "DeFi protocol",
+    data: { companyName: "Vaultline", websiteUrl: "vaultline.xyz", twitterHandle: "vaultline", category: "DeFi" },
   },
   {
-    label: "Try: an AI infra startup",
-    data: {
-      companyName: "Agentframe",
-      websiteUrl: "agentframe.ai",
-      twitterHandle: "agentframe",
-      category: "AI infra",
-    },
+    label: "AI infra startup",
+    data: { companyName: "Agentframe", websiteUrl: "agentframe.ai", twitterHandle: "agentframe", category: "AI infra" },
   },
   {
-    label: "Try: a devtool",
-    data: {
-      companyName: "Mergewell",
-      websiteUrl: "mergewell.dev",
-      twitterHandle: "mergewell",
-      category: "devtool",
-    },
+    label: "Devtool",
+    data: { companyName: "Mergewell", websiteUrl: "mergewell.dev", twitterHandle: "mergewell", category: "devtool" },
   },
 ];
 
@@ -71,9 +56,14 @@ export function Form({
   }
 
   return (
-    <form onSubmit={handle} className="card p-6 md:p-8">
-      <div className="grid gap-5 md:grid-cols-2">
-        <Field label="Company name" hint="The brand name on the homepage">
+    <form onSubmit={handle} className="card p-7 md:p-10">
+      <div className="mb-7 flex flex-wrap items-center justify-between gap-3">
+        <div className="label">/ Inputs</div>
+        <div className="annotation">REQUIRED: COMPANY · WEBSITE · CATEGORY</div>
+      </div>
+
+      <div className="grid gap-7 md:grid-cols-2">
+        <Field label="/ Company name">
           <input
             className="input"
             placeholder="Vaultline"
@@ -83,7 +73,7 @@ export function Form({
             required
           />
         </Field>
-        <Field label="Website URL" hint="We'll diagnose what the homepage says">
+        <Field label="/ Website URL">
           <input
             className="input"
             placeholder="vaultline.xyz"
@@ -93,16 +83,16 @@ export function Form({
             required
           />
         </Field>
-        <Field label="X / Twitter handle" hint="Optional — without the @">
+        <Field label="/ X handle (optional)">
           <input
             className="input"
-            placeholder="vaultline (optional)"
+            placeholder="vaultline"
             value={twitterHandle}
             onChange={e => setTwitterHandle(e.target.value)}
             maxLength={40}
           />
         </Field>
-        <Field label="Category" hint="Picks the right Hivemind frameworks">
+        <Field label="/ Category">
           <select
             className="select"
             value={category}
@@ -115,7 +105,7 @@ export function Form({
             ))}
           </select>
         </Field>
-        <Field label="Competitor URL" hint="Optional — sharpens differentiation">
+        <Field label="/ Competitor URL (optional)">
           <input
             className="input"
             placeholder="optional"
@@ -124,7 +114,7 @@ export function Form({
             maxLength={200}
           />
         </Field>
-        <Field label="Competitor handle" hint="Optional">
+        <Field label="/ Competitor handle (optional)">
           <input
             className="input"
             placeholder="optional"
@@ -135,42 +125,29 @@ export function Form({
         </Field>
       </div>
 
-      <div className="mt-6 flex flex-col items-start gap-3 md:flex-row md:items-center md:justify-between">
-        <div className="flex flex-wrap gap-2">
+      <div className="mt-9 hairline-dim" />
+
+      <div className="mt-7 flex flex-col items-stretch gap-4 md:flex-row md:items-center md:justify-between">
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="annotation mr-1">SAMPLES:</span>
           {SAMPLES.map(s => (
-            <button
-              type="button"
-              key={s.label}
-              onClick={() => fillSample(s.data)}
-              className="btn-ghost text-xs"
-            >
+            <button type="button" key={s.label} onClick={() => fillSample(s.data)} className="btn-ghost">
               {s.label}
             </button>
           ))}
         </div>
         <button type="submit" className="btn-primary" disabled={submitting}>
-          {submitting ? "Running…" : "Run GTM Autopsy →"}
+          {submitting ? "Running…" : "Run Autopsy →"}
         </button>
       </div>
     </form>
   );
 }
 
-function Field({
-  label,
-  hint,
-  children,
-}: {
-  label: string;
-  hint?: string;
-  children: React.ReactNode;
-}) {
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <label className="block">
-      <div className="mb-1.5 flex items-baseline justify-between">
-        <span className="label">{label}</span>
-        {hint ? <span className="text-[11px] text-white/35">{hint}</span> : null}
-      </div>
+      <div className="label mb-3">{label}</div>
       {children}
     </label>
   );

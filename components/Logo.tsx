@@ -1,15 +1,21 @@
-export function Logo({ className = "h-7 w-7" }: { className?: string }) {
+export function Logo({ className = "h-4 w-4", color = "#FFFF6A" }: { className?: string; color?: string }) {
   return (
-    <svg viewBox="0 0 32 32" className={className} aria-hidden>
-      <defs>
-        <linearGradient id="lg" x1="0" x2="1" y1="0" y2="1">
-          <stop offset="0" stopColor="#8B5CF6" />
-          <stop offset="1" stopColor="#22D3EE" />
-        </linearGradient>
-      </defs>
-      <circle cx="16" cy="16" r="14" fill="none" stroke="url(#lg)" strokeWidth="2" />
-      <path d="M9 18 L14 12 L18 20 L23 10" fill="none" stroke="url(#lg)" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
-      <circle cx="23" cy="10" r="1.6" fill="#22D3EE" />
+    <svg viewBox="0 0 32 32" className={className} fill="none" aria-hidden>
+      <line x1="16" y1="2" x2="16" y2="30" stroke={color} strokeWidth="1.8" />
+      <line x1="2" y1="16" x2="30" y2="16" stroke={color} strokeWidth="1.8" />
+      <line x1="6" y1="6" x2="26" y2="26" stroke={color} strokeWidth="1.8" />
+      <line x1="26" y1="6" x2="6" y2="26" stroke={color} strokeWidth="1.8" />
+    </svg>
+  );
+}
+
+export function Asterisk({ size = 16, color = "currentColor" }: { size?: number; color?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none" aria-hidden style={{ display: "block" }}>
+      <line x1="16" y1="2" x2="16" y2="30" stroke={color} strokeWidth="1.6" />
+      <line x1="2" y1="16" x2="30" y2="16" stroke={color} strokeWidth="1.6" />
+      <line x1="6" y1="6" x2="26" y2="26" stroke={color} strokeWidth="1.6" />
+      <line x1="26" y1="6" x2="6" y2="26" stroke={color} strokeWidth="1.6" />
     </svg>
   );
 }
