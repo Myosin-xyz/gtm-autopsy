@@ -141,20 +141,66 @@ Create a new **Custom HTML** tag, paste the `<script>` tag, set the trigger to *
 
 ---
 
-## Visual sanity check before going live
+## Test on the real site first
 
-Before publishing on `myosin.xyz`, paste this into Chrome DevTools on the page you're about to embed on. It loads the widget without touching your site code, so you can see exactly how it'll sit on the real layout:
+Two ways to preview before deploying. Both take under 30 seconds.
 
-```js
-var s = document.createElement('script');
-s.src = 'https://gtm-autopsy.vercel.app/embed.js';
-s.defer = true;
-document.body.appendChild(s);
+### Method A — Inject the widget into the real Hivemind page (recommended)
+
+The most accurate preview possible: it loads the actual widget onto the actual `myosin.xyz/hivemind` page **in your browser only**. Nothing changes for any other visitor. Refreshing removes it.
+
+**Step-by-step:**
+
+1. **Open the host page.** Navigate to `https://myosin.xyz/hivemind` in any modern browser (Chrome, Safari, Firefox, Edge).
+
+2. **Open DevTools.** Press `⌘ + Option + I` on Mac, or `F12` on Windows / Linux. The DevTools panel appears on the right side or bottom of the window.
+
+3. **Click the `Console` tab.** A blinking cursor appears at the prompt — that's where you'll paste.
+
+4. **Paste this and press Enter:**
+
+   ```js
+   var s = document.createElement('script');
+   s.src = 'https://gtm-autopsy.vercel.app/embed.js';
+   s.defer = true;
+   document.body.appendChild(s);
+   ```
+
+5. **Look in the bottom-right corner.** Within ~1 second, a **yellow pill button** appears reading `★ NEW · Run a free GTM Autopsy →`. That's the launcher.
+
+6. **Click the launcher.** The modal opens over the page. Try the full flow: fill in a sample company (or click *Try a sample*) → press `RUN AUTOPSY` → watch the six-step loading sequence → read the teaser report → confirm the `Hire HiveMind →` CTA links to the right place.
+
+7. **Reload the page to remove the widget.** DevTools injections are session-only. Hit refresh (`⌘ + R` / `F5`) and the launcher is gone. Nothing was persisted on Hivemind's site.
+
+> The script URL **must be HTTPS** — browsers block HTTP scripts from running on HTTPS pages.
+
+#### ✅ What "passing the test" looks like
+
+- The launcher button sits in the bottom-right and doesn't overlap any existing UI (nav, chat widget, etc.).
+- Clicking it opens a modal — no layout shift, no broken styles on the host page.
+- The form is readable; the loading sequence animates; the report renders within ~10 seconds.
+- Closing with `×` / `Esc` / overlay-click restores the host page exactly as it was.
+- The browser console shows no red errors related to `gtma-*` or `embed.js`.
+
+If any of these fail, screenshot the console and ping Alice — usually it's a CSP rule on Hivemind's side that needs the rule additions from the [CSP section](#content-security-policy) below.
+
+---
+
+### Method B — Visit the demo page we host
+
+A simpler option for sharing the preview over chat (no DevTools needed):
+
+```
+https://gtm-autopsy.vercel.app/embed-demo
 ```
 
-Wait ~1s, then click the yellow pill. The modal should open cleanly over the page with no layout shift or CSS bleed. Refresh to remove.
+This is a styled-as-Hivemind mock marketing page with the widget already installed. The launcher, modal, fonts, and colors are exactly what'll ship on `myosin.xyz`. Great for sending to a non-technical reviewer.
 
-> Must be the HTTPS production URL — browsers block HTTP scripts from running on HTTPS pages.
+For the modal contents in isolation (e.g. embedding in a pitch deck or screenshot), use:
+
+```
+https://gtm-autopsy.vercel.app/widget
+```
 
 ---
 

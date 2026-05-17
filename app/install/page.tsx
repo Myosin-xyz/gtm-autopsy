@@ -124,20 +124,193 @@ window.GTMAutopsy.isOpen();   // → boolean`}
         <Divider />
 
         <Section
-          label="/ 05 · Test it without touching prod"
-          title="Paste in DevTools on the page you'll embed on."
+          label="/ 05 · Test on the real site first"
+          title="Two ways to preview before you deploy."
         >
-          <CodeBlock code={DEVTOOLS_SNIPPET} />
-          <p className="mt-5 text-sm leading-relaxed text-white/65">
-            Open <span className="kbd">myosin.xyz/hivemind</span> (or wherever you'll install) → DevTools → Console → paste this → Enter. The launcher appears on the real page. Refresh removes it. Use this to confirm placement and CSP compatibility before publishing.
+          <p className="text-sm leading-relaxed text-white/65" style={{ marginTop: -4 }}>
+            Don't push anything to production until you've seen the launcher render on the actual page you'll embed it on. Both methods take under 30 seconds.
           </p>
-          <div className="mt-6 flex flex-wrap gap-3">
-            <a href="/embed-demo" className="btn-primary inline-flex items-center" style={{ textDecoration: "none" }}>
-              See a live demo →
-            </a>
-            <a href="/widget?cta=https%3A%2F%2Fmyosin.xyz%2Fhivemind%23contact" className="btn-ghost inline-flex items-center" style={{ textDecoration: "none" }}>
-              / Open the widget standalone
-            </a>
+
+          <div className="mt-7">
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 10,
+                marginBottom: 12,
+              }}
+            >
+              <span
+                style={{
+                  fontFamily: "var(--font-mono-stack)",
+                  fontSize: 10,
+                  fontWeight: 700,
+                  letterSpacing: "0.14em",
+                  color: "#000",
+                  background: "#FFFF6A",
+                  padding: "3px 8px",
+                  borderRadius: 4,
+                  textTransform: "uppercase",
+                }}
+              >
+                METHOD A · RECOMMENDED
+              </span>
+              <span className="annotation">REAL PAGE · ZERO CODE CHANGES</span>
+            </div>
+            <div style={{ fontSize: 16, fontWeight: 600, color: "#fff", marginBottom: 6 }}>
+              Inject the widget into myosin.xyz/hivemind via browser DevTools
+            </div>
+            <p className="text-sm leading-relaxed text-white/65" style={{ marginBottom: 16 }}>
+              This is the most accurate preview possible — it loads the real widget onto the real Hivemind page in your browser only. Nothing changes for any other visitor. Refreshing the page removes it.
+            </p>
+
+            <Steps
+              steps={[
+                {
+                  label: "Open the host page",
+                  body: (
+                    <>
+                      Navigate to <span className="kbd">https://myosin.xyz/hivemind</span> in Chrome, Safari, Firefox, or Edge. Any modern browser works.
+                    </>
+                  ),
+                },
+                {
+                  label: "Open DevTools",
+                  body: (
+                    <>
+                      Press <span className="kbd">⌘ + Option + I</span> on Mac, or <span className="kbd">F12</span> on Windows / Linux. The DevTools panel appears on the right side or bottom of the window.
+                    </>
+                  ),
+                },
+                {
+                  label: "Click the Console tab",
+                  body: (
+                    <>
+                      In the DevTools header, click <span className="kbd">Console</span>. You'll see a blinking cursor at the prompt — that's where you'll paste.
+                    </>
+                  ),
+                },
+                {
+                  label: "Paste this and press Enter",
+                  body: (
+                    <>
+                      <div style={{ marginTop: 10 }}>
+                        <CodeBlock code={DEVTOOLS_SNIPPET} />
+                      </div>
+                    </>
+                  ),
+                },
+                {
+                  label: "Look in the bottom-right corner",
+                  body: (
+                    <>
+                      Within ~1 second, a <strong style={{ color: "#FFFF6A" }}>yellow pill button</strong> appears in the bottom-right corner of the page. It reads <span className="kbd">★ NEW · Run a free GTM Autopsy →</span>. This is the launcher.
+                    </>
+                  ),
+                },
+                {
+                  label: "Click the launcher",
+                  body: (
+                    <>
+                      The modal opens over the page. Try the full flow: fill in a sample company (or click <em style={{ color: "#FFFF6A", fontStyle: "normal" }}>/ Try a sample</em>) → press <span className="kbd">RUN AUTOPSY</span> → watch the six-step loading sequence → read the teaser report.
+                    </>
+                  ),
+                },
+                {
+                  label: "Reload the page to remove the widget",
+                  body: (
+                    <>
+                      DevTools injections are session-only. Hit refresh (<span className="kbd">⌘ + R</span> / <span className="kbd">F5</span>) and the launcher is gone. Nothing was persisted on Hivemind's site or to other visitors.
+                    </>
+                  ),
+                },
+              ]}
+            />
+
+            <div
+              style={{
+                marginTop: 22,
+                padding: 16,
+                borderLeft: "3px solid #FFFF6A",
+                background: "rgba(255,255,106,0.05)",
+              }}
+            >
+              <div
+                style={{
+                  fontFamily: "var(--font-mono-stack)",
+                  fontSize: 10.5,
+                  fontWeight: 700,
+                  letterSpacing: "0.12em",
+                  textTransform: "uppercase",
+                  color: "#FFFF6A",
+                  marginBottom: 8,
+                }}
+              >
+                / What "passing the test" looks like
+              </div>
+              <ul style={{ listStyle: "none", padding: 0, margin: 0, fontSize: 13.5, color: "rgba(255,255,255,0.85)", lineHeight: 1.65 }}>
+                <li>✓ The launcher button sits in the bottom-right and doesn't overlap any existing UI (nav, chat widget, etc.)</li>
+                <li>✓ Clicking it opens a modal — no layout shift, no broken styles on the host page</li>
+                <li>✓ The form is readable; the loading sequence animates; the report renders within ~10 seconds</li>
+                <li>✓ Closing with × / Esc / overlay-click restores the host page exactly as it was</li>
+                <li>✓ The browser console shows no red errors related to <span className="kbd">gtma-*</span> or <span className="kbd">embed.js</span></li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="my-9 hairline-dim" />
+
+          <div>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 10,
+                marginBottom: 12,
+              }}
+            >
+              <span
+                style={{
+                  fontFamily: "var(--font-mono-stack)",
+                  fontSize: 10,
+                  fontWeight: 700,
+                  letterSpacing: "0.14em",
+                  color: "#fff",
+                  border: "1px solid rgba(255,255,255,0.25)",
+                  padding: "3px 8px",
+                  borderRadius: 4,
+                  textTransform: "uppercase",
+                }}
+              >
+                METHOD B · FASTER
+              </span>
+              <span className="annotation">MOCK PAGE WE ALREADY HOST</span>
+            </div>
+            <div style={{ fontSize: 16, fontWeight: 600, color: "#fff", marginBottom: 6 }}>
+              Visit the demo page we ship with the widget
+            </div>
+            <p className="text-sm leading-relaxed text-white/65" style={{ marginBottom: 16 }}>
+              We host a styled-as-Hivemind mock marketing page with the widget already installed. Useful for sharing the experience over chat without asking anyone to open DevTools. It's a faithful preview — the launcher, modal, fonts, and colors are exactly what'll ship on myosin.xyz.
+            </p>
+            <div className="flex flex-wrap gap-3">
+              <a
+                href="/embed-demo"
+                className="btn-primary inline-flex items-center"
+                style={{ textDecoration: "none" }}
+              >
+                Open the demo →
+              </a>
+              <a
+                href="/widget?cta=https%3A%2F%2Fmyosin.xyz%2Fhivemind%23contact"
+                className="btn-ghost inline-flex items-center"
+                style={{ textDecoration: "none" }}
+              >
+                / Open the widget alone
+              </a>
+            </div>
+            <p className="text-sm leading-relaxed text-white/55 mt-5">
+              Difference between the two: <span className="kbd">/embed-demo</span> shows the launcher on a backdrop and is what you'd send to a non-technical reviewer. <span className="kbd">/widget</span> renders the modal contents only — useful for screenshots or embedding directly in a pitch deck.
+            </p>
           </div>
         </Section>
 
@@ -404,6 +577,53 @@ function Td({
     >
       {children}
     </td>
+  );
+}
+
+function Steps({
+  steps,
+}: {
+  steps: { label: string; body: React.ReactNode }[];
+}) {
+  return (
+    <ol style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: 0 }}>
+      {steps.map((s, i) => (
+        <li
+          key={i}
+          style={{
+            display: "flex",
+            gap: 18,
+            padding: "16px 0",
+            borderTop: i === 0 ? "1px solid rgba(255,255,255,0.12)" : "0",
+            borderBottom: "1px solid rgba(255,255,255,0.08)",
+            alignItems: "flex-start",
+          }}
+        >
+          <span
+            style={{
+              fontFamily: "var(--font-mono-stack)",
+              fontSize: 11,
+              fontWeight: 700,
+              letterSpacing: "0.12em",
+              color: "#FFFF6A",
+              flexShrink: 0,
+              paddingTop: 2,
+              width: 28,
+            }}
+          >
+            {String(i + 1).padStart(2, "0")}
+          </span>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontSize: 15, fontWeight: 600, color: "#fff", marginBottom: 4 }}>
+              {s.label}
+            </div>
+            <div style={{ fontSize: 13.5, color: "rgba(255,255,255,0.7)", lineHeight: 1.6 }}>
+              {s.body}
+            </div>
+          </div>
+        </li>
+      ))}
+    </ol>
   );
 }
 
