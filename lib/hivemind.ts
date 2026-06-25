@@ -4,8 +4,11 @@ import type {
   FrameworkChunk,
   HivemindTraceStep,
   Persona,
+  ScoreCard,
+  TeaserResult,
 } from "./types";
 import { buildMockReport, mockFrameworks } from "./mocks";
+import { normalizeDomain, companyNameFromDomain } from "./domain";
 
 const BASE_URL =
   process.env.HIVEMIND_API_BASE_URL?.replace(/\/$/, "") ||
@@ -319,4 +322,145 @@ export async function runAutopsy(input: AutopsyInput): Promise<AutopsyReport> {
 
 export async function runGTMArchitect(input: AutopsyInput) {
   return runAutopsy(input);
+}
+
+// ── Lead-hook orchestrator: 2 calls (teaser + gated full) ──────────────────
+
+export function inputFromUrl(url: string, xHandle?: string): AutopsyInput | null {
+  const domain = normalizeDomain(url);
+  if (!domain) return null;
+  return {
+    companyName: companyNameFromDomain(domain),
+    websiteUrl: /^https?:\/\//i.test(url) ? url : `https://${url}`,
+    twitterHandle: xHandle?.replace(/^@/, "") || undefined,
+    // server-side default; the architect prompt infers the real category.
+    category: "other",
+  };
+}
+
+function teaserFromMock(input: AutopsyInput, mode: "mock" | "live"): TeaserResult {
+  const mock = buildMockReport(input);
+  return {
+    input,
+    overallScore: mock.overallScore,
+    verdict: mock.verdict,
+    scorecard: mock.scorecard,
+    whatsBroken: mock.whatsBroken,
+    trace: {
+      personasUsed: ["gtm-architect"],
+      frameworks: mockFrameworks(input),
+      steps: [],
+      mode,
+    },
+    generatedAt: new Date().toISOString(),
+  };
+}
+
+// Teaser: single gtm-architect call. Mock fallback on any failure / no creds.
+export async function runTeaser(input: AutopsyInput): Promise<TeaserResult> {
+  if (!hasHivemindCredentials()) return teaserFromMock(input, "mock");
+
+  const frameworks = mockFrameworks(input);
+  try {
+    const out = await chat(gtmArchitectPrompt(input, frameworks), "gtm-architect");
+    const arch = safeJsonParse<{
+      verdict: string;
+      scorecard: ScoreCard;
+      whatsBroken: string[];
+    }>(out.response);
+    if (!arch?.scorecard) throw new Error("non-json");
+    const s = arch.scorecard;
+    const overallScore = Math.round(
+      (s.narrativeClarity +
+        s.icpSharpness +
+        s.proofCredibility +
+        s.categoryDifferentiation +
+        s.distributionLeverage) /
+        5,
+    );
+    const mock = buildMockReport(input);
+    return {
+      input,
+      overallScore,
+      verdict: arch.verdict ?? mock.verdict,
+      scorecard: s,
+      whatsBroken: arch.whatsBroken?.length ? arch.whatsBroken : mock.whatsBroken,
+      trace: { personasUsed: ["gtm-architect"], frameworks, steps: [], mode: "live" },
+      generatedAt: new Date().toISOString(),
+    };
+  } catch {
+    return teaserFromMock(input, "mock");
+  }
+}
+
+type FullOut = {
+  positioningBefore: string;
+  positioningAfter: string;
+  homepageHeroBefore: string;
+  homepageHeroAfter: string;
+  xPosts: string[];
+  linkedinPost: string;
+  coldDm: string;
+  growthExperiments: AutopsyReport["growthExperiments"];
+};
+
+function fullReportPrompt(input: AutopsyInput, teaser: TeaserResult): string {
+  return [
+    `You are the Genius Strategist AND the Ghostwriter for ${input.companyName} (${input.websiteUrl}).`,
+    `Teaser diagnosis: verdict="${teaser.verdict}"; whatsBroken=${JSON.stringify(teaser.whatsBroken)}.`,
+    `Return STRICT JSON:`,
+    `{`,
+    `  "positioningBefore": "1 line", "positioningAfter": "1-2 lines ending with the wedge",`,
+    `  "homepageHeroBefore": "weak generic (1 line)", "homepageHeroAfter": "sharp H1 (1-2 lines)",`,
+    `  "xPosts": ["...", ...5], "linkedinPost": "100-180 words", "coldDm": "3-5 sentences",`,
+    `  "growthExperiments": [{"name":"...","hypothesis":"if/then","effort":"Low|Medium|High + note","metric":"..."}, ...3]`,
+    `}`,
+    `Voice: clipped, no hashtags, no emojis. Strong opinions.`,
+  ].join("\n");
+}
+
+// Full report: ONE combined strategist+ghostwriter call, merged onto the teaser.
+export async function runFullReport(
+  input: AutopsyInput,
+  teaser: TeaserResult,
+): Promise<AutopsyReport> {
+  const mock = buildMockReport(input);
+  let out: FullOut | null = null;
+  if (hasHivemindCredentials()) {
+    try {
+      const res = await chat(fullReportPrompt(input, teaser), "genius-strategist");
+      out = safeJsonParse<FullOut>(res.response);
+    } catch {
+      out = null;
+    }
+  }
+  return {
+    input,
+    overallScore: teaser.overallScore,
+    verdict: teaser.verdict,
+    scorecard: teaser.scorecard,
+    whatsBroken: teaser.whatsBroken,
+    fixesPrioritized: mock.fixesPrioritized,
+    beforeAfter: {
+      homepageHeroBefore: out?.homepageHeroBefore ?? mock.beforeAfter.homepageHeroBefore,
+      homepageHeroAfter: out?.homepageHeroAfter ?? mock.beforeAfter.homepageHeroAfter,
+      positioningBefore: out?.positioningBefore ?? mock.beforeAfter.positioningBefore,
+      positioningAfter: out?.positioningAfter ?? mock.beforeAfter.positioningAfter,
+    },
+    ghostwriter: {
+      xPosts: out?.xPosts?.length ? out.xPosts : mock.ghostwriter.xPosts,
+      linkedinPost: out?.linkedinPost ?? mock.ghostwriter.linkedinPost,
+      coldDm: out?.coldDm ?? mock.ghostwriter.coldDm,
+    },
+    growthExperiments: out?.growthExperiments?.length
+      ? out.growthExperiments
+      : mock.growthExperiments,
+    trace: {
+      personasUsed: ["gtm-architect", "genius-strategist", "ghostwriter"],
+      frameworks: teaser.trace.frameworks,
+      steps: teaser.trace.steps,
+      mode: hasHivemindCredentials() && out ? "live" : "mock",
+    },
+    generatedAt: new Date().toISOString(),
+  };
 }

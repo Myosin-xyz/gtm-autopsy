@@ -315,3 +315,17 @@ Ping Alice (or open an issue on the repo). Common asks we can turn around fast:
   GTMAutopsy.isOpen();
 </script>
 ```
+
+## Lead hook (teaser → email gate → full report)
+
+The widget runs a paywall-style flow built for landing-page lead capture:
+
+1. **Single URL input** — visitor enters a company URL (X handle optional). `companyName` + `category` are inferred server-side.
+2. **Free teaser** (`POST /api/autopsy/teaser`) — one `gtm-architect` call returns score + verdict + 5 "what's broken" bullets. Cached by normalized domain and per-IP rate-limited via the hive-mind DB (`POST /api/v1/autopsy/cache`).
+3. **Email gate** — the full report renders blurred/locked behind an email field (+ Cloudflare Turnstile when configured).
+4. **Capture** (`POST /api/leads`) — verifies Turnstile, blocks disposable emails, then posts the lead to hive-mind `POST /api/v1/leads` (server-side, with the `x-api-key`). The service-role key never touches this app.
+5. **Full report** (`POST /api/autopsy/full`) — one combined `genius-strategist` + `ghostwriter` call returns hero/positioning rewrites, 5 X posts, LinkedIn, cold DM, and 3 growth experiments. The report unlocks.
+
+**Two LLM calls total** (teaser + full); the expensive one only fires after an email. PostHog events (`gtm_autopsy_started`, `_teaser_viewed`, `_email_captured`) fire from the widget when `NEXT_PUBLIC_POSTHOG_KEY` is set.
+
+**Requirements:** the hive-mind endpoints (`/api/v1/leads`, `/api/v1/autopsy/cache`) must be live at `HIVEMIND_API_BASE_URL`. With no env set, everything degrades to mock mode and the gate still opens (no capture). See `.env.example`.

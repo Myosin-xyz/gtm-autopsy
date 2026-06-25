@@ -1,3 +1,6 @@
+// Legacy full-depth (4-call) autopsy mode. NOT used by the lead hook, which
+// uses /api/autopsy/teaser → /api/leads → /api/autopsy/full. Kept for the
+// standalone homepage demo / "all-frameworks" mode.
 import { NextResponse } from "next/server";
 import { runAutopsy, hasHivemindCredentials } from "@/lib/hivemind";
 import type { AutopsyInput, Category } from "@/lib/types";
