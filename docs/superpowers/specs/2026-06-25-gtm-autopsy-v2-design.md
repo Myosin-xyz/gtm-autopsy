@@ -19,14 +19,14 @@ Supersedes the v1 lead hook ([v1 spec](./2026-06-25-gtm-autopsy-lead-hook-design
 Two codebases, bridged by `x-api-key` (no service-role key ever leaves hive-mind):
 
 - **gtm-autopsy (standalone widget)** — the embeddable surface dropped into Framer. Renders the funnel UI, calls hive-mind autopsy endpoints. Holds only the `x-api-key`.
-- **hive-mind (backend)** — owns the scrape (HiveScan), persona analysis, thin project creation, the placeholder user + overrides, the leads table, the conversion → transfer → enrich handoff, and Resend.
+- **hive-mind (backend)** — owns the scrape (HiveScan), persona analysis, thin project creation, the placeholder user + overrides, the leads table, and the conversion → transfer → enrich handoff.
 
 ```
 Framer homepage (myosin.xyz/hivemind)
   └─ <script> embed → gtm-autopsy widget (iframe)
         │  x-api-key
         ▼
-   hive-mind /api/v1/autopsy/* + /api/v1/projects (thin) + Resend
+   hive-mind /api/v1/autopsy/* + /api/v1/projects (thin)
         │  service role
         ▼
    Supabase (staging → prod): project_profiles, gtm_autopsy_leads, auth.users
@@ -59,8 +59,7 @@ Framer homepage (myosin.xyz/hivemind)
   2. **Create a thin project** owned by the placeholder user via the existing creation path with enrichment suppressed (see 3.3): seed `project_name`, `website_url`, `description`, `project_type`/`category`, `social_handles`, `geographics`, `audiences`, `channels` from the scan; `enrichment_status` left deferred.
   3. **Generate the full teardown** (combined `genius-strategist` + `ghostwriter`, grounded in the scan) and store it on the project (`context_report` jsonb) and on the `gtm_autopsy_leads` row (`report`).
   4. write/extend the `gtm_autopsy_leads` row: email, normalized_domain, **`project_id`** (new column → the placeholder-owned project), overall_score, verdict, report, ip_hash, utm/referrer.
-  5. fire the **Resend** report email (3.5).
-- Returns `{ lead_id, project_id, report }` so the widget can unlock the full teardown.
+- Returns `{ lead_id, project_id, report }` so the widget can unlock the full teardown (the CTA then hands off to signup — 3.5).
 
 ### 3.3 Thin creation (hive-mind change)
 - The existing `POST /api/v1/projects` creates a project owned by `getKeyUserId(key)` and reserves quota — but it fires background enrichment (`after(() => …)`, `enrichment_status: 'enriching'`). v2 needs a **thin path**.
@@ -105,9 +104,8 @@ Framer homepage (myosin.xyz/hivemind)
 
 - Scrape failure (unreachable / bot-blocked, HiveScan 422) → teaser falls back to a clearly-labeled "couldn't read your site" state, NOT silent generic mock. Offer retry.
 - Thin-create failure → return the teaser anyway; capture the lead without a `project_id` (degraded), log for backfill.
-- Resend suppressed/failed → don't block the unlock; log.
 - Conversion claim is idempotent (only the first claim transfers; re-runs no-op) and best-effort on enrichment (failures logged, never block signup).
-- Every external dep (HiveScan, chat, Resend, Turnstile) degrades without breaking the funnel; with no creds the standalone app still runs mock for local dev.
+- Every external dep (HiveScan, chat, Turnstile) degrades without breaking the funnel; with no creds the standalone app still runs mock for local dev.
 
 ## 6. Testing
 
