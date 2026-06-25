@@ -49,6 +49,23 @@ export interface HivemindTraceStep {
   sources?: { title: string; author?: string }[];
 }
 
+export interface TeaserResult {
+  input: AutopsyInput;
+  overallScore: number;
+  verdict: string;
+  scorecard: ScoreCard;
+  whatsBroken: string[];
+  trace: AutopsyReport["trace"];
+  generatedAt: string;
+}
+
+export interface GateMeta {
+  utmSource?: string;
+  utmMedium?: string;
+  utmCampaign?: string;
+  referrer?: string;
+}
+
 export interface AutopsyReport {
   input: AutopsyInput;
   overallScore: number;
