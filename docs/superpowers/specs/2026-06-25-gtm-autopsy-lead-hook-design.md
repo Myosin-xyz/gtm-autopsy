@@ -103,8 +103,8 @@ Phases: `idle` → `loading` (teaser) → `teaser` (verdict + scorecard + what's
 - Email submit: Turnstile → `POST /api/leads` → on success fire `POST /api/autopsy/full` → unlock.
 
 ### 4.5 Abuse / rate-limit (cheapest first)
-- **Domain cache** — teaser cached by normalized domain ~7 days in **Upstash Redis** (Vercel-native; off the DB). Biggest lever.
-- **Per-IP rate limit** — Upstash sliding window (e.g. 5/hour, 20/day) on `/api/autopsy/teaser`; returns 429.
+- **Domain cache** — teaser cached by normalized domain ~7 days. **Decided 2026-06-25: backed by the hive-mind Supabase DB** (`gtm_autopsy_teaser_cache`), not Upstash — reached via the authed `POST /api/v1/autopsy/cache` endpoint. Biggest lever.
+- **Per-IP rate limit** — `gtm_autopsy_rate_check` RPC (5/hour, 20/day) over a hashed IP, behind the same authed endpoint; returns 429. Server-trusted (key-authed), so the counter table is never anon-writable.
 - **Cloudflare Turnstile** — invisible widget on the email-submit step, verified server-side in `/api/leads` so the expensive call #2 can't be bot-triggered. Teaser stays frictionless.
 - **Disposable-email block** — reject known disposable domains at capture.
 - **Backstop** — the hive-mind key monthly cap (§3.4).
@@ -113,7 +113,7 @@ Phases: `idle` → `loading` (teaser) → `teaser` (verdict + scorecard + what's
 First-party events from the widget: `gtm_autopsy_started` (URL submitted) → `gtm_autopsy_teaser_viewed` (teaser rendered) → `gtm_autopsy_email_captured` (lead written). The email→signup leg is owned by the DB FK, not PostHog (cross-origin iframe identity stitching is unreliable).
 
 ### 4.7 New env (gtm-autopsy)
-`HIVEMIND_API_KEY` (exists), `HIVEMIND_API_BASE_URL` (point at staging hive-mind), `UPSTASH_REDIS_REST_URL` + `_TOKEN`, `TURNSTILE_SECRET_KEY` + `NEXT_PUBLIC_TURNSTILE_SITE_KEY`, `NEXT_PUBLIC_POSTHOG_KEY` + `_HOST`. `.env.example` updated.
+`HIVEMIND_API_KEY` (exists), `HIVEMIND_API_BASE_URL` (point at staging hive-mind), `TURNSTILE_SECRET_KEY` + `NEXT_PUBLIC_TURNSTILE_SITE_KEY`, `NEXT_PUBLIC_POSTHOG_KEY` + `_HOST`. (No Upstash — cache/rate-limit run on the hive-mind DB.) `.env.example` updated.
 
 ## 5. Data flow (end to end)
 
