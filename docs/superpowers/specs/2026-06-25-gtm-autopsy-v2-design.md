@@ -10,7 +10,8 @@ Supersedes the v1 lead hook ([v1 spec](./2026-06-25-gtm-autopsy-lead-hook-design
 - **Placeholder ownership via the API key:** creating a project with the autopsy `x-api-key` auto-assigns ownership to the key's user (`getKeyUserId`). So lead-projects are owned by **one shared placeholder user** with quota/limit overrides. No nullable-user hacks.
 - **Thin creation at lead time:** website scrape only. **No** social scraping, **no** intelligence reports (the expensive enrichment) until the user actually converts.
 - **Transfer on conversion:** when the captured email signs up through the normal hive-mind flow, **transfer the project's `owner_id`** placeholder → new user and **then** run the expensive onboarding. Ownership transfer is not quota-gated, so the user keeps their 1/month quota.
-- **Email:** Resend the report (reuses hive-mind `sendEmail`).
+- **Email report deferred to roadmap** — cut from v2; revisit (via Resend) only if the teaser→signup UX shows good response.
+- **Signup handoff with email prefill:** the widget CTA deep-links to the Hivemind signup route with the captured email appended (`?email=…`), so the signup form prefills it — the visitor just sets a password, verifies, and lands in-app where the expensive runs fire.
 - **UI:** shrink the oversized input to a compact field + inline errors; brand-match the Hivemind look.
 
 ## 1. Architecture
@@ -37,8 +38,8 @@ Framer homepage (myosin.xyz/hivemind)
 1. Visitor enters URL  ──► [HiveScan scrape] ──► grounded TEASER (score + verdict + top fixes)   [anonymous, free]
 2. Email gate (in widget) ──► create THIN project owned by PLACEHOLDER user (seeded from scrape)
                           ──► generate FULL teardown grounded in scrape ──► store on project + lead row
-                          ──► Resend the report email (CTA: "claim your free project — sign in")
-3. Visitor signs up via normal hive-mind flow (same email)
+                          ──► unlock teardown; CTA → Hivemind signup with email prefilled (?email=…)
+3. Visitor signs up via normal hive-mind flow (same email, prefilled)
                           ──► conversion correlated by email (converted_user_id FK)
                           ──► TRANSFER project owner_id: placeholder → new user (uncharged)
                           ──► run EXPENSIVE onboarding (intelligence reports, optional social scrape)
@@ -73,10 +74,11 @@ Framer homepage (myosin.xyz/hivemind)
   - **Chat/API cap:** already set on the key (`knowledge`/`chat` = 2000 via `api_key_cap_overrides`); raise as needed for teaser+full volume.
   - **Messaging/usage:** add a `user_usage_overrides` / message-quota override if teardown generation would otherwise hit the per-user message cap.
 
-### 3.5 Report email — Resend (hive-mind)
-- Reuse `lib/email/resend.ts` `sendEmail({ to, subject, html, text, tags })` + the templated shell (`lib/email/templates/shell.ts`).
-- Campaign tag `gtm_autopsy_report`. Suppression list + webhook lifecycle handled by existing infra. Content: the teaser highlights + a soft CTA — *"want to dig deeper? create a free account and get started"* — linking to the **normal Hivemind signup route** (`app/(auth)` signup on the hive-mind app), carrying the email so the claim correlates.
-- Recording into `email_sends` is deferred (it requires a `user_id`); link it at conversion if useful.
+### 3.5 Signup handoff — email prefill (gtm-autopsy widget + hive-mind signup form)
+- The unlock CTA deep-links to the **normal Hivemind signup route** with the captured email appended: `…/signup?email=<urlencoded>&utm_source=gtm_autopsy` (plus any existing attribution params).
+- **Small hive-mind change:** the signup form reads the `email` query param and **prefills the email field** so the visitor only sets a password → submits → verifies → lands in-app. Email verification is unchanged.
+- The param is UX-only; conversion correlation still happens server-side by email match (the `converted_user_id` FK), so a tampered/missing param can't break attribution. (A signed token instead of a raw email is a later hardening option.)
+- **Report email (Resend) is cut from v2** — moved to the roadmap (§8). The reusable `sendEmail` infra stays available for when we add it.
 
 ### 3.6 Conversion → transfer → enrich (hive-mind) — the tricky part
 - We already attribute conversion: the `auth.users` AFTER INSERT trigger fills `gtm_autopsy_leads.converted_user_id` on email match (built in v1).
@@ -84,13 +86,13 @@ Framer homepage (myosin.xyz/hivemind)
   1. **Transfer ownership** — `UPDATE project_profiles SET user_id = <new user> WHERE id = <project_id>` (+ reassign any dependent rows: `conversation_ids` owner, etc.). Not quota-gated → no charge to the new user.
   2. **Run the expensive onboarding** for that project now — `runOnboardingSideEffects()` (tag sync, **intelligence reports**, optional social scrape).
   3. mark the lead `status='converted'`, `converted_at` (trigger already does the FK).
-- **Seam (decided):** conversion happens through the **normal Hivemind signup route** — the teaser/teardown CTA and the report email both deep-link there. The claim hooks into that **standard post-signup onboarding path** (where the user's first project is normally created): it checks for a claimable autopsy project (by email match) before/instead of creating a fresh one. No custom auth flow. (Exact code seam in the onboarding path confirmed during planning.)
+- **Seam (decided):** conversion happens through the **normal Hivemind signup route** — the widget CTA deep-links there with the email prefilled (3.5). The claim hooks into that **standard post-signup onboarding path** (where the user's first project is normally created): it checks for a claimable autopsy project (by email match) before/instead of creating a fresh one. No custom auth flow. (Exact code seam in the onboarding path confirmed during planning.)
 - The DB trigger cannot do app-level work (LLM/jobs), so transfer+enrich is app code triggered at signup, keyed off the same email match.
 
 ### 3.7 Widget UI (gtm-autopsy)
 - **Compact input:** replace the oversized idle screen with a single URL field + inline error area (below the field) — no large hero/sample grid dominating the frame.
 - **Teaser → email gate → unlock** (as v1 shape) but grounded content; brand-match to Hivemind (colors/type/spacing from the marketing site).
-- **Unlock CTA:** soft "want to dig into this more? create a free Hivemind account and get started" → deep-links to the normal Hivemind signup route (carrying the email), which is what drives the claim/transfer on signup.
+- **Unlock CTA:** soft "want to dig into this more? create a free Hivemind account and get started" → deep-links to the normal Hivemind signup route with `?email=<captured>` (3.5) so the signup form prefills the email; signup is what drives the claim/transfer.
 - Calls `POST /api/v1/autopsy/teaser` then `/api/v1/autopsy/lead`. PostHog events retained (`started`, `teaser_viewed`, `email_captured`).
 
 ## 4. Data model
@@ -109,19 +111,20 @@ Framer homepage (myosin.xyz/hivemind)
 
 ## 6. Testing
 
-- **hive-mind:** scrape→teaser grounded shape; thin create suppresses enrichment (`enrichment_status='deferred'`, no `after()` job); placeholder override lets N creates through; lead endpoint writes `project_id`; conversion claim transfers `owner_id` + enqueues enrichment + is idempotent; Resend send (suppression respected). Against staging.
+- **hive-mind:** scrape→teaser grounded shape; thin create suppresses enrichment (`enrichment_status='deferred'`, no `after()` job); placeholder override lets N creates through; lead endpoint writes `project_id`; signup form prefills email from `?email=`; conversion claim transfers `owner_id` + enqueues enrichment + is idempotent. Against staging.
 - **gtm-autopsy:** compact UI renders; teaser/lead/unlock happy path; scrape-failure state; mock fallback with no creds; build green.
 
 ## 7. Build order (phased, internal to this spec)
 
 1. **hive-mind:** placeholder user + overrides (project limit, usage); `gtm_autopsy_leads.project_id` migration.
 2. **hive-mind:** `skip_enrichment` thin path on `POST /api/v1/projects`.
-3. **hive-mind:** `POST /api/v1/autopsy/teaser` (scrape + grounded architect) and `POST /api/v1/autopsy/lead` (thin project + full teardown + lead row + Resend).
-4. **hive-mind:** conversion claim (transfer owner_id + deferred enrichment) wired into the signup/onboarding seam.
-5. **gtm-autopsy:** rewire widget to the new endpoints; compact input + inline errors; brand match; grounded teaser/teardown rendering.
+3. **hive-mind:** `POST /api/v1/autopsy/teaser` (scrape + grounded architect) and `POST /api/v1/autopsy/lead` (thin project + full teardown + lead row).
+4. **hive-mind:** signup form email-prefill from `?email=`; conversion claim (transfer owner_id + deferred enrichment) wired into the signup/onboarding seam.
+5. **gtm-autopsy:** rewire widget to the new endpoints; compact input + inline errors; brand match; grounded teaser/teardown rendering; unlock CTA deep-links to signup with `?email=`.
 6. Deploy + embed in Framer; verify end-to-end on staging.
 
-## 8. Out of scope (v2)
+## 8. Out of scope (v2) / roadmap
+- **Report email via Resend** — deferred to the roadmap; revisit if the teaser→signup UX shows good response. The reusable `sendEmail` infra is ready when we want it.
 - In-iframe Supabase auth (explicitly avoided).
 - Social scraping at lead time (deferred; revisit only if teaser quality needs it — intelligence reports stay deferred to conversion regardless).
 - Paid-tier behavior changes; billing UI.
@@ -129,7 +132,9 @@ Framer homepage (myosin.xyz/hivemind)
 ## 9. Decisions & open items
 
 **Resolved (2026-06-25):**
-- **Conversion seam** — the normal Hivemind signup route; teaser CTA + report email deep-link there; claim hooks into the standard post-signup onboarding (email match). No custom auth flow.
+- **Email report cut from v2** — moved to roadmap; revisit if UX response is good.
+- **Signup handoff** — widget CTA deep-links to the Hivemind signup route with `?email=` prefilled; the signup form reads the param and prefills the email field. Correlation still by email match server-side.
+- **Conversion seam** — the normal Hivemind signup route; teaser CTA deep-links there; claim hooks into the standard post-signup onboarding (email match). No custom auth flow.
 - **Thin creation** — add a `skip_enrichment` flag to `POST /api/v1/projects` (approved).
 - **Placeholder user** — use `product@myosin.xyz` for now (real inbox); dedicated sustainable service account is a later follow-up.
 
