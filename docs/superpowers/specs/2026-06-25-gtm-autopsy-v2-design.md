@@ -67,7 +67,7 @@ Framer homepage (myosin.xyz/hivemind)
 - Thin creation still goes through `reserveProjectCreation` under the **placeholder** user, so the placeholder needs a high project-limit override (3.4).
 
 ### 3.4 Placeholder user + overrides (hive-mind / data)
-- **One shared placeholder/service user** owns all unclaimed lead-projects (the user tied to the autopsy `x-api-key`; recommend a dedicated `gtm-autopsy@…` service account).
+- **One shared placeholder/service user** owns all unclaimed lead-projects — the user tied to the autopsy `x-api-key`. **For now: `product@myosin.xyz`** (we need a placeholder with a real, accessible inbox; a dedicated sustainable service account is a later follow-up).
 - Overrides so lead volume never trips default enforcement:
   - **Project creation:** `project_creation_limits` row for the placeholder with a high `monthly_limit` (e.g. 100000) — per the supported per-user override path (`resolveProjectCreationLimit`).
   - **Chat/API cap:** already set on the key (`knowledge`/`chat` = 2000 via `api_key_cap_overrides`); raise as needed for teaser+full volume.
@@ -75,7 +75,7 @@ Framer homepage (myosin.xyz/hivemind)
 
 ### 3.5 Report email — Resend (hive-mind)
 - Reuse `lib/email/resend.ts` `sendEmail({ to, subject, html, text, tags })` + the templated shell (`lib/email/templates/shell.ts`).
-- Campaign tag `gtm_autopsy_report`. Suppression list + webhook lifecycle handled by existing infra. Content: the teaser highlights + a CTA linking to the normal Hivemind signup ("claim your free project").
+- Campaign tag `gtm_autopsy_report`. Suppression list + webhook lifecycle handled by existing infra. Content: the teaser highlights + a soft CTA — *"want to dig deeper? create a free account and get started"* — linking to the **normal Hivemind signup route** (`app/(auth)` signup on the hive-mind app), carrying the email so the claim correlates.
 - Recording into `email_sends` is deferred (it requires a `user_id`); link it at conversion if useful.
 
 ### 3.6 Conversion → transfer → enrich (hive-mind) — the tricky part
@@ -84,12 +84,13 @@ Framer homepage (myosin.xyz/hivemind)
   1. **Transfer ownership** — `UPDATE project_profiles SET user_id = <new user> WHERE id = <project_id>` (+ reassign any dependent rows: `conversation_ids` owner, etc.). Not quota-gated → no charge to the new user.
   2. **Run the expensive onboarding** for that project now — `runOnboardingSideEffects()` (tag sync, **intelligence reports**, optional social scrape).
   3. mark the lead `status='converted'`, `converted_at` (trigger already does the FK).
-- **Seam:** the cleanest hook is the post-signup onboarding path (where the user's first project is normally created). It checks for a claimable autopsy project before/instead of creating a fresh one. Exact seam confirmed during planning (no dedicated new-user route exists today; onboarding runs via `POST /api/projects` / the onboarding flow).
+- **Seam (decided):** conversion happens through the **normal Hivemind signup route** — the teaser/teardown CTA and the report email both deep-link there. The claim hooks into that **standard post-signup onboarding path** (where the user's first project is normally created): it checks for a claimable autopsy project (by email match) before/instead of creating a fresh one. No custom auth flow. (Exact code seam in the onboarding path confirmed during planning.)
 - The DB trigger cannot do app-level work (LLM/jobs), so transfer+enrich is app code triggered at signup, keyed off the same email match.
 
 ### 3.7 Widget UI (gtm-autopsy)
 - **Compact input:** replace the oversized idle screen with a single URL field + inline error area (below the field) — no large hero/sample grid dominating the frame.
 - **Teaser → email gate → unlock** (as v1 shape) but grounded content; brand-match to Hivemind (colors/type/spacing from the marketing site).
+- **Unlock CTA:** soft "want to dig into this more? create a free Hivemind account and get started" → deep-links to the normal Hivemind signup route (carrying the email), which is what drives the claim/transfer on signup.
 - Calls `POST /api/v1/autopsy/teaser` then `/api/v1/autopsy/lead`. PostHog events retained (`started`, `teaser_viewed`, `email_captured`).
 
 ## 4. Data model
@@ -125,9 +126,14 @@ Framer homepage (myosin.xyz/hivemind)
 - Social scraping at lead time (deferred; revisit only if teaser quality needs it — intelligence reports stay deferred to conversion regardless).
 - Paid-tier behavior changes; billing UI.
 
-## 9. Open items (resolve in planning)
-- Exact signup/onboarding seam for the conversion claim (read the onboarding flow; confirm where the first project is created).
-- `skip_enrichment` flag vs dedicated thin endpoint (lean: flag).
+## 9. Decisions & open items
+
+**Resolved (2026-06-25):**
+- **Conversion seam** — the normal Hivemind signup route; teaser CTA + report email deep-link there; claim hooks into the standard post-signup onboarding (email match). No custom auth flow.
+- **Thin creation** — add a `skip_enrichment` flag to `POST /api/v1/projects` (approved).
+- **Placeholder user** — use `product@myosin.xyz` for now (real inbox); dedicated sustainable service account is a later follow-up.
+
+**Still open (resolve in planning):**
+- Exact code location of the onboarding seam that creates the first project (trace it, hook the claim there).
 - Whether to seed `project_profiles.context_report` with the teardown vs a dedicated field.
 - Confirm no `COUNT(*)`-over-`project_profiles` quota path exists that would retroactively count a transferred project (explorer says none).
-- Dedicated placeholder service user vs reusing the current `product@myosin.xyz`-tied key user.
