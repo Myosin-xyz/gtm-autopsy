@@ -8,7 +8,6 @@ const TEASER_STEPS = ["Reading your site", "Running GTM Architect diagnosis", "S
 const FULL_STEPS = ["Finding the strategic wedge", "Rewriting hero + posts", "Compiling the full plan"];
 
 const EXAMPLE_URL = "stripe.com";
-const BINARY_NOISE = ["00 0 01", "0 10 01", "0 01 00 0"];
 
 const HIVEMIND_APP_URL =
   process.env.NEXT_PUBLIC_HIVEMIND_APP_URL || "https://hivemind.myosin.xyz";
@@ -34,7 +33,7 @@ function errorCopy(err: string): string {
   }
 }
 
-export function WidgetApp({ ctaUrl, ctaLabel }: { ctaUrl: string; ctaLabel: string }) {
+export function WidgetApp() {
   const [phase, setPhase] = useState<Phase>("idle");
   const [stepIdx, setStepIdx] = useState(0);
   const [error, setError] = useState<string | null>(null);
@@ -144,19 +143,6 @@ export function WidgetApp({ ctaUrl, ctaLabel }: { ctaUrl: string; ctaLabel: stri
 
   return (
     <div className="myo-root">
-      <header className="myo-header">
-        <div className="myo-header-row">
-          <div className="myo-brand">
-            <Asterisk size={14} />
-            <span className="myo-brand-name">HIVEMIND</span>
-            <span className="myo-brand-slash">/</span>
-            <span className="myo-brand-product">GTM AUTOPSY</span>
-          </div>
-          <span className="myo-annotation">{BINARY_NOISE[0]}</span>
-        </div>
-        <div className="myo-hairline" />
-      </header>
-
       <div className="myo-body">
         {phase === "idle" && (
           <IdleScreen url={url} setUrl={setUrl} onSubmit={submitUrl} error={error} />
@@ -181,24 +167,9 @@ export function WidgetApp({ ctaUrl, ctaLabel }: { ctaUrl: string; ctaLabel: stri
           />
         )}
         {phase === "full" && report && teaser && (
-          <FullScreen
-            report={report}
-            teaser={teaser}
-            email={email}
-            ctaUrl={ctaUrl}
-            ctaLabel={ctaLabel}
-            onReset={reset}
-          />
+          <FullScreen report={report} teaser={teaser} email={email} onReset={reset} />
         )}
       </div>
-
-      <footer className="myo-footer">
-        <div className="myo-hairline" />
-        <div className="myo-footer-row">
-          <span className="myo-annotation">2025 / MYOSIN</span>
-          <span className="myo-annotation">{BINARY_NOISE[2]}</span>
-        </div>
-      </footer>
 
       <WidgetStyles />
     </div>
@@ -504,15 +475,11 @@ function FullScreen({
   report,
   teaser,
   email,
-  ctaUrl,
-  ctaLabel,
   onReset,
 }: {
   report: ReportV2;
   teaser: TeaserV2;
   email: string;
-  ctaUrl: string;
-  ctaLabel: string;
   onReset: () => void;
 }) {
   const signupHref = `${HIVEMIND_APP_URL}/auth/signup?email=${encodeURIComponent(email)}&utm_source=gtm_autopsy`;
@@ -574,14 +541,6 @@ function FullScreen({
         >
           CREATE A FREE ACCOUNT →
         </a>
-        <a
-          href={ctaUrl}
-          target="_top"
-          rel="noopener"
-          className="myo-secondary-link"
-        >
-          {ctaLabel}
-        </a>
         <button onClick={onReset} className="myo-reset-btn">/ Run another autopsy</button>
       </div>
     </div>
@@ -614,32 +573,15 @@ function WidgetStyles() {
         --myo-pink: #ff29e8;
         --myo-red: #ff2a38;
         --font-mono-stack: var(--font-mono), "Courier New", monospace;
-        --font-body-stack: var(--font-body), "IBM Plex Sans", Arial, sans-serif;
+        --font-body-stack: var(--font-body), Inter, Arial, sans-serif;
       }
+      /* Transparent throughout so the embedding page supplies the background. */
       html, body { background: transparent; margin: 0; padding: 0; }
       .myo-root {
-        height: 100vh; display: flex; flex-direction: column;
-        background: var(--myo-black); color: var(--myo-white);
-        font-family: var(--font-body-stack); overflow: hidden; position: relative;
+        min-height: 100vh; display: flex; flex-direction: column;
+        background: transparent; color: var(--myo-white);
+        font-family: var(--font-body-stack); position: relative;
       }
-      .myo-root::before {
-        content: ""; position: absolute; inset: 0;
-        background-image:
-          linear-gradient(to right, rgba(255,255,255,0.025) 1px, transparent 1px),
-          linear-gradient(to bottom, rgba(255,255,255,0.025) 1px, transparent 1px);
-        background-size: 56px 56px; pointer-events: none; z-index: 0;
-      }
-      .myo-header, .myo-body, .myo-footer { position: relative; z-index: 1; }
-      .myo-header { padding: 14px 18px 0; }
-      .myo-header-row { display: flex; align-items: center; justify-content: space-between; padding-bottom: 12px; }
-      .myo-brand { display: flex; align-items: center; gap: 8px; }
-      .myo-brand-name { font-family: var(--font-mono-stack); font-size: 11px; font-weight: 700; letter-spacing: 0.12em; color: var(--myo-yellow); }
-      .myo-brand-slash { color: rgba(255,255,255,0.25); font-family: var(--font-mono-stack); font-size: 11px; }
-      .myo-brand-product { font-family: var(--font-mono-stack); font-size: 11px; font-weight: 500; letter-spacing: 0.1em; }
-      .myo-annotation { font-family: var(--font-mono-stack); font-size: 9.5px; letter-spacing: 0.12em; color: rgba(255,255,255,0.35); text-transform: uppercase; }
-      .myo-hairline { height: 1px; background: rgba(255,255,255,0.18); width: 100%; }
-      .myo-footer { padding: 0 18px 12px; }
-      .myo-footer-row { display: flex; align-items: center; justify-content: space-between; padding-top: 10px; }
       .myo-body { flex: 1; overflow-y: auto; padding: 22px 20px 24px; scrollbar-width: thin; }
       .myo-body::-webkit-scrollbar { width: 6px; }
       .myo-body::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 6px; }
@@ -664,7 +606,6 @@ function WidgetStyles() {
       .myo-locked { filter: blur(7px); pointer-events: none; user-select: none; opacity: 0.55; }
       .myo-gate { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; padding: 22px; border-radius: 16px; background: linear-gradient(180deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.85) 100%); border: 1px solid rgba(255,255,106,0.4); }
       .myo-unlocked-banner { font-family: var(--font-mono-stack); font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--myo-lime); border: 1px solid rgba(172,250,82,0.4); border-radius: 999px; padding: 8px 14px; text-align: center; }
-      .myo-secondary-link { display: block; margin-top: 10px; text-align: center; color: rgba(0,0,0,0.7); font-family: var(--font-mono-stack); font-weight: 700; font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase; text-decoration: underline; }
       .myo-reset-btn { width: 100%; margin-top: 8px; padding: 11px 16px; background: transparent; border: 1px solid rgba(0,0,0,0.4); color: #000; font-family: var(--font-mono-stack); font-weight: 500; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer; border-radius: 999px; }
       .myo-pulse-dot { width: 7px; height: 7px; border-radius: 999px; background: #ffff6a; display: inline-block; animation: myoPulse 1.4s ease-in-out infinite; }
       .myo-shimmer-bar { height: 100%; width: 100%; background: linear-gradient(90deg, transparent, var(--myo-yellow), transparent); background-size: 200% 100%; animation: myoShimmer 1.2s linear infinite; }

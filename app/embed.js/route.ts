@@ -33,8 +33,6 @@ function buildScript(origin: string) {
     buttonIcon: d.icon || '',
     position: d.position || 'bottom-right',
     accent: d.accent || '#FFFF6A',
-    cta: d.cta || (location.origin + (location.pathname || '/') + '#contact'),
-    ctaLabel: d.ctaLabel || 'Hire Hivemind →',
     auto: d.auto === 'true',
   };
 
@@ -110,10 +108,8 @@ function buildScript(origin: string) {
     iframe.setAttribute('title', 'GTM Autopsy by Hivemind');
     iframe.setAttribute('loading', 'lazy');
     iframe.setAttribute('referrerpolicy', 'no-referrer-when-downgrade');
-    var params = new URLSearchParams();
-    params.set('cta', config.cta);
-    params.set('label', config.ctaLabel);
-    iframe.src = ORIGIN + '/widget?' + params.toString();
+    iframe.setAttribute('allowtransparency', 'true');
+    iframe.src = ORIGIN + '/widget';
     modal.appendChild(iframe);
 
     overlay.appendChild(modal);

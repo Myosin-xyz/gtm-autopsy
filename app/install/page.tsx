@@ -6,8 +6,6 @@ import { Logo, Asterisk } from "@/components/Logo";
 const FULL_SNIPPET = `<script
   src="https://gtm-autopsy.vercel.app/embed.js"
   data-label="Run a free GTM Autopsy"
-  data-cta="https://myosin.xyz/hivemind#contact"
-  data-cta-label="Hire HiveMind →"
   data-position="bottom-right"
   data-accent="#FFFF6A"
   defer
@@ -24,8 +22,6 @@ const CONFIG_ROWS = [
   { attr: "data-label", default: "Run a free GTM Autopsy", desc: "Text on the launcher pill." },
   { attr: "data-position", default: "bottom-right", desc: "bottom-right · bottom-left · top-right · top-left" },
   { attr: "data-accent", default: "#FFFF6A", desc: "Launcher background. Any valid CSS color." },
-  { attr: "data-cta", default: "current page #contact", desc: "Where the 'Hire HiveMind' button inside the report links to." },
-  { attr: "data-cta-label", default: "Hire HiveMind →", desc: "Text of that CTA." },
   { attr: "data-auto", default: "false", desc: "If true, auto-opens 800ms after load." },
 ];
 
