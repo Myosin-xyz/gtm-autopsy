@@ -272,7 +272,7 @@ function LoadingScreen({ steps, idx, title }: { steps: string[]; idx: number; ti
     <div>
       <div
         className="myo-kicker"
-        style={{ color: "var(--myo-yellow)", display: "flex", alignItems: "center", gap: 8 }}
+        style={{ color: "var(--myo-pink)", display: "flex", alignItems: "center", gap: 8 }}
       >
         <span className="myo-pulse-dot" />
         / RUNNING
@@ -297,7 +297,7 @@ function LoadingScreen({ steps, idx, title }: { steps: string[]; idx: number; ti
                   fontFamily: "var(--font-mono-stack)",
                   fontSize: 10,
                   fontWeight: 700,
-                  color: state === "done" ? "var(--myo-yellow)" : state === "active" ? "#fff" : "rgba(255,255,255,0.3)",
+                  color: state === "done" ? "var(--myo-lime)" : state === "active" ? "#fff" : "rgba(255,255,255,0.3)",
                   width: 28,
                 }}
               >
@@ -313,7 +313,7 @@ function LoadingScreen({ steps, idx, title }: { steps: string[]; idx: number; ti
                   </div>
                 )}
               </div>
-              <span style={{ fontFamily: "var(--font-mono-stack)", fontSize: 9.5, color: state === "done" ? "var(--myo-yellow)" : "rgba(255,255,255,0.35)" }}>
+              <span style={{ fontFamily: "var(--font-mono-stack)", fontSize: 9.5, color: state === "done" ? "var(--myo-lime)" : "rgba(255,255,255,0.35)" }}>
                 {state === "done" ? "✓ OK" : state === "active" ? "..." : ""}
               </span>
             </li>
@@ -326,7 +326,7 @@ function LoadingScreen({ steps, idx, title }: { steps: string[]; idx: number; ti
 
 function ScoreHeader({ teaser }: { teaser: TeaserV2 }) {
   const score = teaser.overallScore;
-  const scoreColor = score >= 60 ? "#FFFF6A" : score >= 35 ? "#FFA22F" : "#FF2A38";
+  const scoreColor = score >= 60 ? "#ACFA52" : score >= 35 ? "#FFA22F" : "#FF2A38";
   const scoreLabel = score >= 60 ? "PASSING" : score >= 35 ? "WORK TO DO" : "CRITICAL";
   const company = teaser.scan?.projectName || "Your company";
   const category = teaser.scan?.category?.[0] || "GTM";
@@ -404,7 +404,7 @@ function TeaserScreen(props: {
         </div>
 
         <div className="myo-gate">
-          <div style={{ fontFamily: "var(--font-mono-stack)", fontSize: 10, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--myo-yellow)", marginBottom: 8 }}>
+          <div style={{ fontFamily: "var(--font-mono-stack)", fontSize: 10, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--myo-pink)", marginBottom: 8 }}>
             / Unlock the full teardown
           </div>
           <div style={{ fontSize: 13, color: "rgba(255,255,255,0.85)", lineHeight: 1.5, marginBottom: 14 }}>
@@ -522,23 +522,18 @@ function FullScreen({
       </div>
 
       {/* Primary unlock CTA → Hivemind signup with email prefilled. */}
-      <div style={{ background: "var(--myo-yellow)", color: "#000", borderRadius: 16, padding: 22, position: "relative", overflow: "hidden" }}>
-        <div style={{ position: "absolute", top: 14, right: 14, opacity: 0.4 }}>
-          <Asterisk size={20} color="#000" />
+      <div className="myo-cta-card">
+        <div style={{ position: "absolute", top: 14, right: 14, opacity: 0.25 }}>
+          <Asterisk size={20} color="var(--myo-pink)" />
         </div>
-        <div style={{ fontFamily: "var(--font-mono-stack)", fontSize: 20, fontWeight: 700, lineHeight: 1.15, textTransform: "uppercase", color: "#000" }}>
+        <div className="myo-display" style={{ fontSize: 20, lineHeight: 1.15 }}>
           Knowing what&apos;s broken<br />is the easy part.
         </div>
-        <div style={{ fontSize: 12.5, color: "rgba(0,0,0,0.75)", lineHeight: 1.55, marginTop: 10 }}>
+        <div style={{ fontSize: 12.5, color: "rgba(255,255,255,0.65)", lineHeight: 1.55, marginTop: 10 }}>
           Your autopsy is already in your Hivemind workspace. Bring in the swarm and turn it into the
           full plan.
         </div>
-        <a
-          href={signupHref}
-          target="_top"
-          rel="noopener"
-          style={{ display: "block", marginTop: 14, padding: "13px 18px", background: "#000", color: "var(--myo-yellow)", textDecoration: "none", textAlign: "center", fontFamily: "var(--font-mono-stack)", fontWeight: 700, fontSize: 12, letterSpacing: "0.14em", textTransform: "uppercase", borderRadius: 999 }}
-        >
+        <a href={signupHref} target="_top" rel="noopener" className="myo-btn-primary" style={{ display: "block", marginTop: 16, textDecoration: "none" }}>
           CREATE A FREE ACCOUNT →
         </a>
         <button onClick={onReset} className="myo-reset-btn">/ Run another autopsy</button>
@@ -562,11 +557,9 @@ function WidgetStyles() {
   return (
     <style jsx global>{`
       :root {
-        /* Brand-matched to the Hivemind app tokens (app/globals.css):
-           --primary #FFFF6A, --background #262626, --text-primary #F6F6F6,
-           --status-pink #FF29E8. */
-        --myo-yellow: #ffff6a;
-        --myo-black: #262626;
+        /* Matched to the Hivemind marketing site: black canvas, ABC Maxi
+           display, pink→magenta gradient as the primary accent (the "Hire
+           Hivemind" pill), lime + violet as secondary signals. */
         --myo-white: #f6f6f6;
         --myo-blue: #6989fe;
         --myo-lime: #acfa52;
@@ -587,28 +580,32 @@ function WidgetStyles() {
       .myo-body::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 6px; }
       .myo-kicker { font-family: var(--font-mono-stack); font-size: 10px; letter-spacing: 0.18em; color: rgba(255,255,255,0.45); text-transform: uppercase; margin-bottom: 14px; }
       .myo-display { font-family: var(--font-mono-stack); font-weight: 700; font-size: 26px; line-height: 1.0; letter-spacing: -0.01em; text-transform: uppercase; color: var(--myo-white); margin: 0; }
-      .myo-display em { font-style: normal; color: var(--myo-yellow); }
+      .myo-display em { font-style: normal; color: var(--myo-pink); }
       .myo-lead { font-family: var(--font-body-stack); font-size: 13.5px; line-height: 1.55; color: rgba(255,255,255,0.7); margin: 14px 0 22px; }
       .myo-label { font-family: var(--font-mono-stack); font-size: 10px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(255,255,255,0.55); margin-bottom: 8px; }
       .myo-input { width: 100%; background: transparent; border: 0; border-bottom: 1px solid rgba(255,255,255,0.25); padding: 10px 0; color: var(--myo-white); font-size: 15px; font-family: var(--font-body-stack); transition: border-color 120ms ease; border-radius: 0; }
       .myo-input::placeholder { color: rgba(255,255,255,0.35); }
-      .myo-input:focus { outline: none; border-bottom-color: var(--myo-yellow); }
-      .myo-btn-primary { width: 100%; background: var(--myo-yellow); color: var(--myo-black); font-family: var(--font-mono-stack); font-weight: 700; font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; padding: 14px 20px; border: 0; border-radius: 999px; cursor: pointer; transition: background 120ms ease, transform 120ms ease; }
-      .myo-btn-primary:hover { background: #fff; transform: translateY(-1px); }
+      .myo-input:focus { outline: none; border-bottom-color: var(--myo-pink); }
+      /* Matches the Hivemind "Hire Hivemind" button from Framer: cream pill,
+         inner pink glow, 1px pink border. */
+      .myo-btn-primary { width: 100%; box-sizing: border-box; background-color: #d7d6c8; color: #1a1320; font-family: var(--font-mono-stack); font-weight: 700; font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; text-align: center; padding: 16px 25px; border: 1px solid var(--myo-pink); border-radius: 999px; box-shadow: inset 0 0 25px 0 #ff337e; cursor: pointer; transition: box-shadow 140ms ease, transform 140ms ease; }
+      .myo-btn-primary:hover { box-shadow: inset 0 0 34px 0 #ff337e; transform: translateY(-1px); }
       .myo-text-link { background: transparent; border: 0; color: rgba(255,255,255,0.5); font-family: var(--font-mono-stack); font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; padding: 4px 0; text-align: center; transition: color 120ms ease; }
-      .myo-text-link:hover { color: var(--myo-yellow); }
-      .myo-card { border: 1px solid rgba(255,255,255,0.14); border-radius: 16px; padding: 18px; background: rgba(255,255,255,0.015); position: relative; }
+      .myo-text-link:hover { color: var(--myo-pink); }
+      .myo-card { border: 1px solid rgba(255,255,255,0.12); border-radius: 16px; padding: 18px; background: rgba(255,255,255,0.02); position: relative; }
       .myo-card-label { font-family: var(--font-mono-stack); font-size: 10px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(255,255,255,0.5); }
+      .myo-cta-card { position: relative; border: 1px solid rgba(255,41,232,0.3); border-radius: 16px; padding: 22px; background: rgba(255,41,232,0.05); box-shadow: 0 0 44px rgba(232,31,201,0.14); overflow: hidden; }
       .myo-chip { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 999px; font-family: var(--font-mono-stack); font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }
-      .myo-chip-accent { border: 1px solid rgba(255,255,106,0.5); color: var(--myo-yellow); }
+      .myo-chip-accent { border: 1px solid rgba(255,41,232,0.5); color: var(--myo-pink); }
       .myo-chip-muted { border: 1px solid rgba(255,255,255,0.25); color: rgba(255,255,255,0.6); }
       .myo-error { font-family: var(--font-mono-stack); font-size: 11px; color: #ff2a38; padding: 8px 0; border-top: 1px solid rgba(255,42,56,0.4); border-bottom: 1px solid rgba(255,42,56,0.4); letter-spacing: 0.08em; text-transform: uppercase; }
       .myo-locked { filter: blur(7px); pointer-events: none; user-select: none; opacity: 0.55; }
-      .myo-gate { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; padding: 22px; border-radius: 16px; background: linear-gradient(180deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.85) 100%); border: 1px solid rgba(255,255,106,0.4); }
+      .myo-gate { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; padding: 22px; border-radius: 16px; background: linear-gradient(180deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.85) 100%); border: 1px solid rgba(255,41,232,0.4); }
       .myo-unlocked-banner { font-family: var(--font-mono-stack); font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--myo-lime); border: 1px solid rgba(172,250,82,0.4); border-radius: 999px; padding: 8px 14px; text-align: center; }
-      .myo-reset-btn { width: 100%; margin-top: 8px; padding: 11px 16px; background: transparent; border: 1px solid rgba(0,0,0,0.4); color: #000; font-family: var(--font-mono-stack); font-weight: 500; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer; border-radius: 999px; }
-      .myo-pulse-dot { width: 7px; height: 7px; border-radius: 999px; background: #ffff6a; display: inline-block; animation: myoPulse 1.4s ease-in-out infinite; }
-      .myo-shimmer-bar { height: 100%; width: 100%; background: linear-gradient(90deg, transparent, var(--myo-yellow), transparent); background-size: 200% 100%; animation: myoShimmer 1.2s linear infinite; }
+      .myo-reset-btn { width: 100%; margin-top: 10px; padding: 11px 16px; background: transparent; border: 1px solid rgba(255,255,255,0.2); color: rgba(255,255,255,0.55); font-family: var(--font-mono-stack); font-weight: 500; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer; border-radius: 999px; transition: color 120ms ease, border-color 120ms ease; }
+      .myo-reset-btn:hover { color: var(--myo-white); border-color: rgba(255,255,255,0.4); }
+      .myo-pulse-dot { width: 7px; height: 7px; border-radius: 999px; background: var(--myo-pink); display: inline-block; animation: myoPulse 1.4s ease-in-out infinite; }
+      .myo-shimmer-bar { height: 100%; width: 100%; background: linear-gradient(90deg, transparent, var(--myo-pink), transparent); background-size: 200% 100%; animation: myoShimmer 1.2s linear infinite; }
       @keyframes myoShimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
       @keyframes myoPulse { 0%, 100% { opacity: 0.4; transform: scale(0.85); } 50% { opacity: 1; transform: scale(1); } }
     `}</style>
