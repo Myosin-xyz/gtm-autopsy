@@ -1,24 +1,31 @@
 import { NextResponse } from "next/server";
-import { createHash } from "node:crypto";
 import { verifyTurnstile } from "@/lib/turnstile";
 import { isDisposableEmail } from "@/lib/disposable-email";
-import { postLead } from "@/lib/leads-client";
-import type { TeaserResult } from "@/lib/types";
+import { hasHivemindCredentials } from "@/lib/hivemind";
+import { mockReportV2 } from "@/lib/mock-v2";
+import type { AutopsyScanV2, TeaserV2 } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
+
+const BASE_URL =
+  process.env.HIVEMIND_API_BASE_URL?.replace(/\/$/, "") || "https://hivemind.myosin.xyz";
 
 function clientIp(req: Request): string {
   return req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "0.0.0.0";
 }
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+// Email gate → hive-mind v2 lead endpoint. Forwards the `scan` + `teaser` the
+// widget already has so hive-mind builds the grounded teardown and the thin
+// placeholder project without re-scraping. Returns { lead_id, project_id,
+// report }. Mock fallback (no key) returns a deterministic report so dev works.
 export async function POST(req: Request) {
   let body: {
     email?: string;
     url?: string;
-    xHandle?: string;
-    teaser?: TeaserResult;
+    scan?: AutopsyScanV2;
+    teaser?: TeaserV2;
     turnstileToken?: string;
     utm?: Record<string, string>;
     referrer?: string;
@@ -39,24 +46,46 @@ export async function POST(req: Request) {
   const human = await verifyTurnstile(body.turnstileToken, ip);
   if (!human) return NextResponse.json({ error: "turnstile_failed" }, { status: 403 });
 
-  const ip_hash = createHash("sha256").update(`${ip}:gtm-autopsy`).digest("hex");
+  if (!hasHivemindCredentials()) {
+    return NextResponse.json({
+      lead_id: null,
+      project_id: null,
+      report: mockReportV2(body.url),
+    });
+  }
 
   try {
-    const result = await postLead({
-      email,
-      website_url: body.url,
-      x_handle: body.xHandle ?? null,
-      overall_score: body.teaser?.overallScore ?? null,
-      verdict: body.teaser?.verdict ?? null,
-      report: body.teaser ?? null,
-      utm_source: body.utm?.utm_source ?? null,
-      utm_medium: body.utm?.utm_medium ?? null,
-      utm_campaign: body.utm?.utm_campaign ?? null,
-      referrer: body.referrer ?? null,
-      ip_hash,
+    const res = await fetch(`${BASE_URL}/api/v1/autopsy/lead`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        "x-api-key": process.env.HIVEMIND_API_KEY!,
+      },
+      body: JSON.stringify({
+        email,
+        url: body.url,
+        scan: body.scan,
+        teaser: body.teaser,
+        turnstileToken: body.turnstileToken,
+        utm_source: body.utm?.utm_source ?? null,
+        utm_medium: body.utm?.utm_medium ?? null,
+        utm_campaign: body.utm?.utm_campaign ?? null,
+        referrer: body.referrer ?? null,
+      }),
+      cache: "no-store",
     });
-    // result is null in dev (no Hivemind key) — still open the gate.
-    return NextResponse.json({ success: true, lead_id: result?.lead_id ?? null });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok || !data.report) {
+      return NextResponse.json(
+        { error: data.error ?? "capture_failed" },
+        { status: res.status || 502 },
+      );
+    }
+    return NextResponse.json({
+      lead_id: data.lead_id ?? null,
+      project_id: data.project_id ?? null,
+      report: data.report,
+    });
   } catch (e) {
     return NextResponse.json(
       { error: "capture_failed", detail: String(e).slice(0, 160) },

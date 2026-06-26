@@ -59,6 +59,37 @@ export interface TeaserResult {
   generatedAt: string;
 }
 
+// ── v2 shapes (grounded; produced by the hive-mind autopsy endpoints) ──────
+
+export interface AutopsyScanV2 {
+  projectName: string;
+  description: string;
+  category: string[];
+  socialHandles: Record<string, string>;
+  audiences: string[];
+  channels: string[];
+  rawText?: string;
+}
+
+export interface TeaserV2 {
+  overallScore: number;
+  verdict: string;
+  scorecard: ScoreCard;
+  whatsBroken: string[];
+  scan: AutopsyScanV2;
+}
+
+export interface ReportV2 {
+  positioningBefore: string;
+  positioningAfter: string;
+  homepageHeroBefore: string;
+  homepageHeroAfter: string;
+  xPosts: string[];
+  linkedinPost: string;
+  coldDm: string;
+  growthExperiments: string[];
+}
+
 export interface GateMeta {
   utmSource?: string;
   utmMedium?: string;
