@@ -66,7 +66,7 @@ export function WidgetApp() {
     track("gtm_autopsy_started", { url: url.trim() });
     const t0 = Date.now();
     try {
-      const res = await fetch("/api/autopsy/teaser", {
+      const res = await fetch("/api/teardown/teaser", {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ url: url.trim() }),

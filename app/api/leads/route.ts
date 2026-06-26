@@ -55,7 +55,7 @@ export async function POST(req: Request) {
   }
 
   try {
-    const res = await fetch(`${BASE_URL}/api/v1/autopsy/lead`, {
+    const res = await fetch(`${BASE_URL}/api/v1/teardown/lead`, {
       method: "POST",
       headers: {
         "content-type": "application/json",

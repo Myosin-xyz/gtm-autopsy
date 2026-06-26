@@ -37,7 +37,7 @@ export async function POST(req: Request) {
   const ipHash = createHash("sha256").update(`${clientIp(req)}:gtm-autopsy`).digest("hex");
 
   try {
-    const res = await fetch(`${BASE_URL}/api/v1/autopsy/teaser`, {
+    const res = await fetch(`${BASE_URL}/api/v1/teardown/teaser`, {
       method: "POST",
       headers: {
         "content-type": "application/json",
