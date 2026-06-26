@@ -18,17 +18,17 @@ type Phase = "idle" | "loadingTeaser" | "teaser" | "scanFailed" | "loadingFull" 
 function errorCopy(err: string): string {
   switch (err) {
     case "rate_limited":
-      return "/ ERROR: Too many tries — slow down and retry shortly";
+      return "/ ERROR: Too many tries. Slow down and retry shortly";
     case "invalid_url":
       return "/ ERROR: Enter a valid company URL";
     case "scan_failed":
-      return "/ ERROR: Couldn't read that site — check the URL and retry";
+      return "/ ERROR: Couldn't read that site. Check the URL and retry";
     case "invalid_email":
       return "/ ERROR: Enter a valid email";
     case "disposable_email":
       return "/ ERROR: Use a real work email";
     case "turnstile_failed":
-      return "/ ERROR: Verification failed — try again";
+      return "/ ERROR: Verification failed. Try again";
     default:
       return `/ ERROR: ${err}`;
   }
@@ -219,7 +219,7 @@ function IdleScreen(props: {
       </h2>
       <p className="myo-lead" style={{ margin: "10px 0 18px" }}>
         Paste your URL. Hivemind reads your site, diagnoses what&apos;s broken, and rewrites your
-        hero — grounded in your real copy. The teardown is free.
+        hero, grounded in your real copy. The teardown is free.
       </p>
 
       <form onSubmit={props.onSubmit} style={{ display: "flex", flexDirection: "column", gap: 10 }}>
@@ -271,9 +271,9 @@ function ScanFailedScreen(props: {
   return (
     <div>
       <div className="myo-kicker" style={{ color: "var(--myo-red)" }}>/ COULDN&apos;T READ YOUR SITE</div>
-      <h3 className="myo-display" style={{ fontSize: 22 }}>Let&apos;s try that again.</h3>
+      <h3 className="myo-display" style={{ fontSize: 22 }}>Give it another shot.</h3>
       <p className="myo-lead" style={{ margin: "10px 0 18px" }}>
-        We couldn&apos;t scrape that URL — it may be down, blocking bots, or mistyped. Double-check
+        We couldn&apos;t scrape that URL. It might be down, blocking bots, or just mistyped. Check it
         and run it again.
       </p>
       <form onSubmit={props.onRetry} style={{ display: "flex", flexDirection: "column", gap: 10 }}>
@@ -419,8 +419,8 @@ function TeaserScreen(props: {
           <div className="myo-card">
             <div className="myo-card-label">/ Positioning + hero · before → after</div>
             <p style={{ margin: "10px 0 0", fontSize: 14, color: "#fff", lineHeight: 1.5 }}>
-              Your positioning and homepage hero, rewritten in your founder voice — sharper,
-              category-defining, and built around the wedge the strategist found.
+              Your positioning and homepage hero, rewritten in your founder voice. Sharper,
+              category-defining, built around the wedge the strategist found.
             </p>
           </div>
           <div className="myo-card" style={{ marginTop: 12 }}>
@@ -437,8 +437,8 @@ function TeaserScreen(props: {
             / Unlock the full teardown
           </div>
           <div style={{ fontSize: 13, color: "rgba(255,255,255,0.85)", lineHeight: 1.5, marginBottom: 14 }}>
-            Rewritten positioning + homepage hero, 5 X posts, a LinkedIn post, a cold DM, and 3
-            growth experiments — grounded in your real site. Free — enter your email to unlock.
+            Rewritten positioning and homepage hero, 5 X posts, a LinkedIn post, a cold DM, and 3
+            growth experiments, all grounded in your real site. Free. Enter your email to unlock.
           </div>
           <form onSubmit={props.onSubmitEmail} style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             <input
@@ -563,7 +563,7 @@ function FullScreen({
           Want to dig into<br />this more?
         </div>
         <div style={{ fontSize: 12.5, color: "rgba(0,0,0,0.75)", lineHeight: 1.55, marginTop: 10 }}>
-          Create a free Hivemind account — this autopsy is already waiting in your workspace, ready
+          Create a free Hivemind account. This autopsy is already waiting in your workspace, ready
           to turn into a full GTM plan.
         </div>
         <a
