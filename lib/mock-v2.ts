@@ -1,6 +1,6 @@
 import { companyNameFromDomain, normalizeDomain } from "./domain";
 import { buildMockReport } from "./mocks";
-import type { AutopsyInput, ReportV2, TeaserV2 } from "./types";
+import type { AutopsyInput, TeaserV2 } from "./types";
 
 // Deterministic mock v2 shapes for local dev (no HIVEMIND_API_KEY). Reuses the
 // existing mock report generator and projects it onto the grounded v2 shapes so
@@ -35,17 +35,3 @@ export function mockTeaserV2(url: string): TeaserV2 {
   };
 }
 
-export function mockReportV2(url: string): ReportV2 {
-  const input = inputFor(url);
-  const m = buildMockReport(input);
-  return {
-    positioningBefore: m.beforeAfter.positioningBefore,
-    positioningAfter: m.beforeAfter.positioningAfter,
-    homepageHeroBefore: m.beforeAfter.homepageHeroBefore,
-    homepageHeroAfter: m.beforeAfter.homepageHeroAfter,
-    xPosts: m.ghostwriter.xPosts,
-    linkedinPost: m.ghostwriter.linkedinPost,
-    coldDm: m.ghostwriter.coldDm,
-    growthExperiments: m.growthExperiments.map((g) => `${g.name} — ${g.hypothesis}`),
-  };
-}

@@ -49,16 +49,6 @@ export interface HivemindTraceStep {
   sources?: { title: string; author?: string }[];
 }
 
-export interface TeaserResult {
-  input: AutopsyInput;
-  overallScore: number;
-  verdict: string;
-  scorecard: ScoreCard;
-  whatsBroken: string[];
-  trace: AutopsyReport["trace"];
-  generatedAt: string;
-}
-
 // ── v2 shapes (grounded; produced by the hive-mind autopsy endpoints) ──────
 
 export interface AutopsyScanV2 {
@@ -77,24 +67,6 @@ export interface TeaserV2 {
   scorecard: ScoreCard;
   whatsBroken: string[];
   scan: AutopsyScanV2;
-}
-
-export interface ReportV2 {
-  positioningBefore: string;
-  positioningAfter: string;
-  homepageHeroBefore: string;
-  homepageHeroAfter: string;
-  xPosts: string[];
-  linkedinPost: string;
-  coldDm: string;
-  growthExperiments: string[];
-}
-
-export interface GateMeta {
-  utmSource?: string;
-  utmMedium?: string;
-  utmCampaign?: string;
-  referrer?: string;
 }
 
 export interface AutopsyReport {

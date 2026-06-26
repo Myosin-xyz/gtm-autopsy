@@ -1,8 +1,8 @@
+import { createHash } from "node:crypto";
 import { NextResponse } from "next/server";
 import { verifyTurnstile } from "@/lib/turnstile";
 import { isDisposableEmail } from "@/lib/disposable-email";
 import { hasHivemindCredentials } from "@/lib/hivemind";
-import { mockReportV2 } from "@/lib/mock-v2";
 import type { AutopsyScanV2, TeaserV2 } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
@@ -47,12 +47,10 @@ export async function POST(req: Request) {
   if (!human) return NextResponse.json({ error: "turnstile_failed" }, { status: 403 });
 
   if (!hasHivemindCredentials()) {
-    return NextResponse.json({
-      lead_id: null,
-      project_id: null,
-      report: mockReportV2(body.url),
-    });
+    return NextResponse.json({ ok: true, status: "generating" });
   }
+
+  const ipHash = createHash("sha256").update(`${clientIp(req)}:gtm-autopsy`).digest("hex");
 
   try {
     const res = await fetch(`${BASE_URL}/api/v1/teardown/lead`, {
@@ -67,6 +65,7 @@ export async function POST(req: Request) {
         scan: body.scan,
         teaser: body.teaser,
         turnstileToken: body.turnstileToken,
+        ip_hash: ipHash,
         utm_source: body.utm?.utm_source ?? null,
         utm_medium: body.utm?.utm_medium ?? null,
         utm_campaign: body.utm?.utm_campaign ?? null,
@@ -75,17 +74,13 @@ export async function POST(req: Request) {
       cache: "no-store",
     });
     const data = await res.json().catch(() => ({}));
-    if (!res.ok || !data.report) {
+    if (!res.ok) {
       return NextResponse.json(
         { error: data.error ?? "capture_failed" },
         { status: res.status || 502 },
       );
     }
-    return NextResponse.json({
-      lead_id: data.lead_id ?? null,
-      project_id: data.project_id ?? null,
-      report: data.report,
-    });
+    return NextResponse.json({ ok: true, status: data.status ?? "generating" });
   } catch (e) {
     return NextResponse.json(
       { error: "capture_failed", detail: String(e).slice(0, 160) },
