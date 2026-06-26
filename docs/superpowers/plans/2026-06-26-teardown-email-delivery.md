@@ -912,3 +912,21 @@ cd /home/mitch/github/gtm-autopsy && git push myosin feat/gtm-autopsy-v2-widget
 - Open in-task discovery: presence of `isDisposableEmail` / `verifyTurnstile` in hive-mind (D4 Step 1) — port from the widget if absent. The `TeardownReport.tsx` styling reuses the widget `WidgetStyles` CSS verbatim (D5 Step 2).
 - Phase A2 is intentionally executed inside Phase E (E2) once the inline teardown is gone; listed early only for visibility.
 </content>
+
+---
+
+## Completion summary (2026-06-26)
+
+**Status: implemented, reviewed, fixed, pushed.** Executed subagent-driven.
+
+- **Branch consolidation:** v2 backend folded into one hive-mind branch `feat/gtm-autopsy-leads` (PR **#306** → staging); former #307 closed. Widget on `feat/gtm-autopsy-v2-widget` (PR **#2**).
+- **Done:** dead-code removal (A1, ~2k lines); `autopsy→teardown` rename across both repos (B1/B2) incl. user-facing copy + embed/install/titles; migration applied to staging + **all 5 feature migrations squashed** into `20260626_gtm_autopsy_teardown.sql` (C1); email template + send helper (D1/D2); background generate-and-deliver job (D3); lead endpoint rewrite — validate/rate-limit/dedupe/Turnstile/202 background-deliver (D4); public `/teardown/[token]` page + loader (D5); widget email-sent flow + inline-teardown removal (E1/E2).
+- **Final verification:** hive-mind `type-check` + eslint clean; widget `tsc` + `build` green. Integration tests pass vs staging+OpenRouter (teaser grounding, generate-and-deliver, claim idempotency, email template).
+- **Final review (opus, both repos):** widget approved; hive-mind approve-with-changes → fixed: failed leads now retryable (dedupe excludes `failed` + page error state), per-email 24h send cap (anti email-bomb), migration header corrected.
+- **Not done (hand-off):** D6 live E2E with a real inbox; regenerate `database.types.ts` to drop the `project_id`/`report_token`/`report_status` typed shims; apply the consolidated migration to **prod** deliberately; set `RESEND_*`/`TURNSTILE_SECRET_KEY` (prod) + `HIVEMIND_*`/`NEXT_PUBLIC_TURNSTILE_SITE_KEY` (Vercel).
+
+### D6 — live E2E steps (for the operator)
+1. `cd /home/mitch/github/hive-mind-gtm-leads && npm run dev` (→ :3000) and `npm run dev` (→ :3030).
+2. Open `http://localhost:3030/widget`, run a teardown, submit a **real** address you control.
+3. Confirm: 202 from the lead endpoint; an email arrives via Resend with a `/teardown/<token>` link; the link renders the teardown on :3000 with the signup CTA (email prefilled); signing up transfers the project (claim-on-signup).
+4. Clean up the test lead + project rows.
