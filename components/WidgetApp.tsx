@@ -184,7 +184,6 @@ function IdleScreen(props: {
 }) {
   return (
     <div>
-      <div className="myo-kicker">/ FREE GTM DIAGNOSTIC · 60 SECONDS</div>
       <h2 className="myo-display" style={{ fontSize: 26 }}>
         Stop sounding like <em>the category.</em>
       </h2>
@@ -220,15 +219,6 @@ function IdleScreen(props: {
           try an example → {EXAMPLE_URL}
         </button>
       </form>
-
-      <div style={{ marginTop: 22, paddingTop: 16, borderTop: "1px solid rgba(255,255,255,0.1)" }}>
-        <div className="myo-label" style={{ marginBottom: 10 }}>/ Powered by Hivemind</div>
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-          <span className="myo-chip myo-chip-accent">▰ GTM Architect</span>
-          <span className="myo-chip myo-chip-muted">✦ Strategist</span>
-          <span className="myo-chip myo-chip-muted">✎ Ghostwriter</span>
-        </div>
-      </div>
     </div>
   );
 }
@@ -595,9 +585,6 @@ function WidgetStyles() {
       .myo-card { border: 1px solid rgba(255,255,255,0.12); border-radius: 16px; padding: 18px; background: rgba(255,255,255,0.02); position: relative; }
       .myo-card-label { font-family: var(--font-mono-stack); font-size: 10px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(255,255,255,0.5); }
       .myo-cta-card { position: relative; border: 1px solid rgba(255,41,232,0.3); border-radius: 16px; padding: 22px; background: rgba(255,41,232,0.05); box-shadow: 0 0 44px rgba(232,31,201,0.14); overflow: hidden; }
-      .myo-chip { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 999px; font-family: var(--font-mono-stack); font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }
-      .myo-chip-accent { border: 1px solid rgba(255,41,232,0.5); color: var(--myo-pink); }
-      .myo-chip-muted { border: 1px solid rgba(255,255,255,0.25); color: rgba(255,255,255,0.6); }
       .myo-error { font-family: var(--font-mono-stack); font-size: 11px; color: #ff2a38; padding: 8px 0; border-top: 1px solid rgba(255,42,56,0.4); border-bottom: 1px solid rgba(255,42,56,0.4); letter-spacing: 0.08em; text-transform: uppercase; }
       .myo-locked { filter: blur(7px); pointer-events: none; user-select: none; opacity: 0.55; }
       .myo-gate { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; padding: 22px; border-radius: 16px; background: linear-gradient(180deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.85) 100%); border: 1px solid rgba(255,41,232,0.4); }
