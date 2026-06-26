@@ -1,18 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import type { ReportV2, TeaserV2 } from "@/lib/types";
+import type { TeaserV2 } from "@/lib/types";
 import { initAnalytics, track } from "@/lib/analytics";
 
 const TEASER_STEPS = ["GTM Architect reading your site", "Diagnosing the narrative", "Scoring against your category"];
-const FULL_STEPS = ["Strategist finding the wedge", "Ghostwriter rewriting in your voice", "The swarm compiling your plan"];
 
 const EXAMPLE_URL = "stripe.com";
 
-const HIVEMIND_APP_URL =
-  process.env.NEXT_PUBLIC_HIVEMIND_APP_URL || "https://hivemind.myosin.xyz";
-
-type Phase = "idle" | "loadingTeaser" | "teaser" | "scanFailed" | "loadingFull" | "full";
+type Phase = "idle" | "loadingTeaser" | "teaser" | "scanFailed" | "sent";
 
 function errorCopy(err: string): string {
   switch (err) {
@@ -41,19 +37,17 @@ export function WidgetApp() {
   const [url, setUrl] = useState("");
   const [email, setEmail] = useState("");
   const [teaser, setTeaser] = useState<TeaserV2 | null>(null);
-  const [report, setReport] = useState<ReportV2 | null>(null);
   const [turnstileToken, setTurnstileToken] = useState<string | undefined>(undefined);
 
   useEffect(() => {
     initAnalytics();
   }, []);
 
-  // Animate the loading step list during the two loading phases.
+  // Animate the loading step list during the teaser loading phase.
   useEffect(() => {
-    if (phase !== "loadingTeaser" && phase !== "loadingFull") return;
-    const steps = phase === "loadingTeaser" ? TEASER_STEPS : FULL_STEPS;
-    if (stepIdx >= steps.length - 1) return;
-    const t = setTimeout(() => setStepIdx((i) => Math.min(steps.length - 1, i + 1)), 750);
+    if (phase !== "loadingTeaser") return;
+    if (stepIdx >= TEASER_STEPS.length - 1) return;
+    const t = setTimeout(() => setStepIdx((i) => Math.min(TEASER_STEPS.length - 1, i + 1)), 750);
     return () => clearTimeout(t);
   }, [phase, stepIdx]);
 
@@ -93,9 +87,6 @@ export function WidgetApp() {
     e.preventDefault();
     if (!email.trim() || !teaser) return;
     setError(null);
-    setStepIdx(0);
-    setPhase("loadingFull");
-    const t0 = Date.now();
     try {
       const res = await fetch("/api/leads", {
         method: "POST",
@@ -114,16 +105,13 @@ export function WidgetApp() {
         }),
       });
       const data = await res.json();
-      if (!res.ok || !data.report) {
+      if (!res.ok || !data.ok) {
         setError(data.error ?? "capture_failed");
         setPhase("teaser");
         return;
       }
       track("gtm_autopsy_email_captured", { url: url.trim() });
-      const elapsed = Date.now() - t0;
-      if (elapsed < 2400) await new Promise((r) => setTimeout(r, 2400 - elapsed));
-      setReport(data.report as ReportV2);
-      setPhase("full");
+      setPhase("sent");
     } catch (err) {
       setError(String(err));
       setPhase("teaser");
@@ -135,7 +123,6 @@ export function WidgetApp() {
     setUrl("");
     setEmail("");
     setTeaser(null);
-    setReport(null);
     setTurnstileToken(undefined);
     setStepIdx(0);
     setError(null);
@@ -153,9 +140,6 @@ export function WidgetApp() {
         {phase === "loadingTeaser" && (
           <LoadingScreen steps={TEASER_STEPS} idx={stepIdx} title="Reading the room." />
         )}
-        {phase === "loadingFull" && (
-          <LoadingScreen steps={FULL_STEPS} idx={stepIdx} title="Writing the plan." />
-        )}
         {phase === "teaser" && teaser && (
           <TeaserScreen
             teaser={teaser}
@@ -166,8 +150,8 @@ export function WidgetApp() {
             error={error}
           />
         )}
-        {phase === "full" && report && teaser && (
-          <FullScreen report={report} teaser={teaser} email={email} onReset={reset} />
+        {phase === "sent" && (
+          <EmailSentScreen email={email} onReset={reset} />
         )}
       </div>
 
@@ -208,7 +192,7 @@ function IdleScreen(props: {
         {props.error && <div className="myo-error">{errorCopy(props.error)}</div>}
 
         <button type="submit" className="myo-btn-primary" style={{ marginTop: 6 }}>
-          RUN AUTOPSY →
+          RUN TEARDOWN →
         </button>
 
         <button
@@ -250,7 +234,7 @@ function ScanFailedScreen(props: {
         />
         {props.error && <div className="myo-error">{errorCopy(props.error)}</div>}
         <button type="submit" className="myo-btn-primary" style={{ marginTop: 6 }}>
-          RETRY AUTOPSY →
+          RETRY TEARDOWN →
         </button>
       </form>
     </div>
@@ -451,95 +435,17 @@ function Turnstile({ onToken }: { onToken: (t: string | undefined) => void }) {
   );
 }
 
-function BeforeAfter({ label, before, after }: { label: string; before: string; after: string }) {
+function EmailSentScreen({ email, onReset }: { email: string; onReset: () => void }) {
   return (
-    <div className="myo-card">
-      <div className="myo-card-label">/ {label}</div>
-      <div style={{ marginTop: 10, fontSize: 12.5, color: "rgba(255,255,255,0.5)", lineHeight: 1.5, textDecoration: "line-through" }}>{before}</div>
-      <div style={{ marginTop: 8, fontSize: 14, color: "#fff", lineHeight: 1.55, fontWeight: 500 }}>{after}</div>
+    <div>
+      <div className="myo-kicker" style={{ color: "var(--myo-lime)" }}>/ CHECK YOUR INBOX</div>
+      <h3 className="myo-display" style={{ fontSize: 24 }}>Your teardown is on its way.</h3>
+      <p className="myo-lead" style={{ margin: "10px 0 18px" }}>
+        We&apos;re building your full teardown now and sending it to {email}. Open the email to read
+        the rewrite, the posts, and the plan.
+      </p>
+      <button onClick={onReset} className="myo-text-link">/ run another teardown</button>
     </div>
-  );
-}
-
-function FullScreen({
-  report,
-  teaser,
-  email,
-  onReset,
-}: {
-  report: ReportV2;
-  teaser: TeaserV2;
-  email: string;
-  onReset: () => void;
-}) {
-  const signupHref = `${HIVEMIND_APP_URL}/auth/signup?email=${encodeURIComponent(email)}&utm_source=gtm_autopsy`;
-  return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-      <div className="myo-unlocked-banner">✓ Full teardown unlocked</div>
-      <ScoreHeader teaser={teaser} />
-      <WhatsBroken items={teaser.whatsBroken} max={5} />
-      <BeforeAfter label="Homepage hero · before → after" before={report.homepageHeroBefore} after={report.homepageHeroAfter} />
-      <BeforeAfter label="Positioning · before → after" before={report.positioningBefore} after={report.positioningAfter} />
-
-      <div className="myo-card">
-        <div className="myo-card-label">/ 5 X posts</div>
-        <ul style={{ listStyle: "none", padding: 0, margin: "10px 0 0", display: "flex", flexDirection: "column", gap: 10 }}>
-          {report.xPosts.map((p, i) => (
-            <li key={i} style={{ fontSize: 13, color: "#fff", lineHeight: 1.5, paddingBottom: 10, borderBottom: i < report.xPosts.length - 1 ? "1px solid rgba(255,255,255,0.08)" : "0" }}>{p}</li>
-          ))}
-        </ul>
-      </div>
-
-      <div className="myo-card">
-        <div className="myo-card-label">/ LinkedIn post</div>
-        <p style={{ margin: "10px 0 0", fontSize: 13, color: "#fff", lineHeight: 1.6, whiteSpace: "pre-wrap" }}>{report.linkedinPost}</p>
-      </div>
-      <div className="myo-card">
-        <div className="myo-card-label">/ Cold DM</div>
-        <p style={{ margin: "10px 0 0", fontSize: 13, color: "#fff", lineHeight: 1.6 }}>{report.coldDm}</p>
-      </div>
-
-      <div className="myo-card">
-        <div className="myo-card-label">/ 3 growth experiments</div>
-        <ul style={{ listStyle: "none", padding: 0, margin: "10px 0 0", display: "flex", flexDirection: "column", gap: 12 }}>
-          {report.growthExperiments.map((g, i) => (
-            <li key={i} style={{ display: "flex", gap: 14, paddingBottom: 12, borderBottom: i < report.growthExperiments.length - 1 ? "1px solid rgba(255,255,255,0.08)" : "0", fontSize: 12.5, color: "rgba(255,255,255,0.85)", lineHeight: 1.5 }}>
-              <span style={{ fontFamily: "var(--font-mono-stack)", fontSize: 11, fontWeight: 700, color: "var(--myo-lime)", flexShrink: 0, paddingTop: 1 }}>0{i + 1}</span>
-              <span>{g}</span>
-            </li>
-          ))}
-        </ul>
-      </div>
-
-      {/* Primary unlock CTA → Hivemind signup with email prefilled. */}
-      <div className="myo-cta-card">
-        <div style={{ position: "absolute", top: 14, right: 14, opacity: 0.25 }}>
-          <Asterisk size={20} color="var(--myo-pink)" />
-        </div>
-        <div className="myo-display" style={{ fontSize: 20, lineHeight: 1.15 }}>
-          Knowing what&apos;s broken<br />is the easy part.
-        </div>
-        <div style={{ fontSize: 12.5, color: "rgba(255,255,255,0.65)", lineHeight: 1.55, marginTop: 10 }}>
-          Your autopsy is already in your Hivemind workspace. Bring in the swarm and turn it into the
-          full plan.
-        </div>
-        <a href={signupHref} target="_top" rel="noopener" className="myo-btn-primary" style={{ display: "block", marginTop: 16, textDecoration: "none" }}>
-          CREATE A FREE ACCOUNT →
-        </a>
-        <button onClick={onReset} className="myo-reset-btn">/ Run another autopsy</button>
-      </div>
-    </div>
-  );
-}
-
-function Asterisk({ size = 14, color = "currentColor" }: { size?: number; color?: string }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 32 32" fill="none" aria-hidden style={{ display: "block" }}>
-      <line x1="16" y1="2" x2="16" y2="30" stroke={color} strokeWidth="1.6" />
-      <line x1="2" y1="16" x2="30" y2="16" stroke={color} strokeWidth="1.6" />
-      <line x1="6" y1="6" x2="26" y2="26" stroke={color} strokeWidth="1.6" />
-      <line x1="26" y1="6" x2="6" y2="26" stroke={color} strokeWidth="1.6" />
-    </svg>
   );
 }
 
