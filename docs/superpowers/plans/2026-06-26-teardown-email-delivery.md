@@ -10,7 +10,7 @@
 
 ## Global Constraints
 
-- **Two repos / two branches.** Hive-mind work continues on `feat/gtm-autopsy-v2-backend` (worktree `/home/mitch/github/hive-mind-gtm-v2`, draft PR #307 → `staging`, stacked on #306). Widget work continues on `feat/gtm-autopsy-v2-widget` (`/home/mitch/github/gtm-autopsy`, PR Myosin-xyz/gtm-autopsy#2 → `main`). The rename touches files owned by #306 (`cache` route, `cache-store`, `leads-auth`, lead validate/insert); rename them on the #307 branch and take the rename on the eventual #306→#307 rebase.
+- **One branch per repo / one PR per repo.** Hive-mind work is on the single branch `feat/gtm-autopsy-leads` (worktree `/home/mitch/github/hive-mind-gtm-leads`, draft PR #306 → `staging` — all v2 backend commits were consolidated onto it; the former #307 is closed). Widget work is on `feat/gtm-autopsy-v2-widget` (`/home/mitch/github/gtm-autopsy`, PR Myosin-xyz/gtm-autopsy#2 → `main`). No stacking — every hive-mind change in this plan lands directly on `feat/gtm-autopsy-leads`.
 - **Naming:** the feature is **`teardown`** in all code, routes, modules, files, identifiers, the public page, and the email. The string "GTM Autopsy" appears in no user-facing copy.
 - **Database object names are NOT renamed.** `gtm_autopsy_leads`, `gtm_autopsy_teaser_cache`, `gtm_autopsy_rate_events`, `gtm_autopsy_rate_check`, `gtm_autopsy_leads_on_signup`, `gtm_lookup_auth_user_id`, and existing columns keep their names (storage, not API surface; renaming risks the applied #306 staging migrations). Code that queries them keeps those exact string literals.
 - **Target DB: staging only** (`zxjidctilwncsgwamfgn`). Apply migrations via the Supabase MCP `apply_migration`; migrations are raw SQL in `scripts/supabase/migrations/`, named `20260626<letter>_*.sql`.
@@ -98,7 +98,7 @@ git add -A && git commit -m "refactor(widget): remove legacy standalone demo + c
 
 ### Task B1: Rename hive-mind routes + lib modules
 
-**Files (hive-mind worktree `/home/mitch/github/hive-mind-gtm-v2`):**
+**Files (hive-mind worktree `/home/mitch/github/hive-mind-gtm-leads`):**
 - Move: `app/api/v1/autopsy/{teaser,lead,cache}` → `app/api/v1/teardown/{teaser,lead,cache}`
 - Move: `lib/api/v1/autopsy/*.ts` → `lib/api/v1/teardown/*.ts` (`scan`, `teaser`, `full-report`, `create-thin-project`, `voice`, `cache-store`)
 - Move: `lib/projects/claim-autopsy-project.ts` → `lib/projects/claim-teardown-project.ts`
@@ -112,7 +112,7 @@ git add -A && git commit -m "refactor(widget): remove legacy standalone demo + c
 - [ ] **Step 1: Move route + lib directories with git**
 
 ```bash
-cd /home/mitch/github/hive-mind-gtm-v2
+cd /home/mitch/github/hive-mind-gtm-leads
 git mv app/api/v1/autopsy app/api/v1/teardown
 git mv lib/api/v1/autopsy lib/api/v1/teardown
 git mv lib/projects/claim-autopsy-project.ts lib/projects/claim-teardown-project.ts
@@ -125,7 +125,7 @@ git mv test/gtm-autopsy-thin-create.test.ts test/teardown-thin-create.test.ts
 - [ ] **Step 2: Rewrite import paths (`v1/autopsy` → `v1/teardown`, `claim-autopsy-project` → `claim-teardown-project`)**
 
 ```bash
-cd /home/mitch/github/hive-mind-gtm-v2
+cd /home/mitch/github/hive-mind-gtm-leads
 grep -rl "lib/api/v1/autopsy\|api/v1/autopsy\|claim-autopsy-project" app lib test --include=*.ts --include=*.tsx \
  | xargs sed -i 's#api/v1/autopsy#api/v1/teardown#g; s#claim-autopsy-project#claim-teardown-project#g'
 ```
@@ -133,7 +133,7 @@ grep -rl "lib/api/v1/autopsy\|api/v1/autopsy\|claim-autopsy-project" app lib tes
 - [ ] **Step 3: Rename the `claimAutopsyProject` identifier**
 
 ```bash
-cd /home/mitch/github/hive-mind-gtm-v2
+cd /home/mitch/github/hive-mind-gtm-leads
 grep -rl "claimAutopsyProject" app lib test --include=*.ts --include=*.tsx \
  | xargs sed -i 's#claimAutopsyProject#claimTeardownProject#g'
 ```
@@ -146,7 +146,7 @@ In the moved `lib/api/v1/teardown/teaser.ts` and `full-report.ts`, change the Op
 - [ ] **Step 5: Type-check + run the moved tests**
 
 ```bash
-cd /home/mitch/github/hive-mind-gtm-v2
+cd /home/mitch/github/hive-mind-gtm-leads
 npm run type-check
 npx --yes tsx --env-file-if-exists=.env.local test/teardown-thin-create.test.ts
 ```
@@ -897,11 +897,11 @@ git commit -m "refactor(widget): delete inline teardown rendering + dead mock/re
 - [ ] **Step 1: Push both branches**
 
 ```bash
-cd /home/mitch/github/hive-mind-gtm-v2 && git push origin feat/gtm-autopsy-v2-backend
+cd /home/mitch/github/hive-mind-gtm-leads && git push origin feat/gtm-autopsy-leads
 cd /home/mitch/github/gtm-autopsy && git push myosin feat/gtm-autopsy-v2-widget
 ```
 
-- [ ] **Step 2: Update the two existing PR descriptions** (#307 hive-mind, #2 widget) to describe the email-delivery flow + the teardown rename + the dead-code removal. Note the DB tables retain `gtm_autopsy_*` names and the rename spans #306/#307.
+- [ ] **Step 2: Update the two existing PR descriptions** (#306 hive-mind, #2 widget) to describe the email-delivery flow + the teardown rename + the dead-code removal. Note the DB tables retain `gtm_autopsy_*` names.
 
 ---
 
