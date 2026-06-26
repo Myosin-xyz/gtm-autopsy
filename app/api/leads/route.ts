@@ -16,10 +16,10 @@ function clientIp(req: Request): string {
 }
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-// Email gate → hive-mind v2 lead endpoint. Forwards the `scan` + `teaser` the
-// widget already has so hive-mind builds the grounded teardown and the thin
-// placeholder project without re-scraping. Returns { lead_id, project_id,
-// report }. Mock fallback (no key) returns a deterministic report so dev works.
+// Email gate → hive-mind v2 lead endpoint. Forwards the `email`, `scan`, and
+// `teaser` the widget already has so hive-mind generates + emails the full
+// teardown in the background (grounded, placeholder-owned project). Returns
+// { ok, status }. Mock fallback (no credentials) returns { ok: true, status: "generating" }.
 export async function POST(req: Request) {
   let body: {
     email?: string;

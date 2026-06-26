@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { inter, abcMaxi } from "@/lib/fonts";
 
 export const metadata: Metadata = {
-  title: "GTM Autopsy · HiveMind",
+  title: "GTM Teardown · HiveMind",
   description:
     "Paste a URL. Get a brutally honest go-to-market teardown (positioning, ICP, narrative, channels, and rewrites) powered by HiveMind personas.",
 };

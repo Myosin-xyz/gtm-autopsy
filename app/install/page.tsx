@@ -5,7 +5,7 @@ import { Logo, Asterisk } from "@/components/Logo";
 
 const FULL_SNIPPET = `<script
   src="https://gtm-autopsy.vercel.app/embed.js"
-  data-label="Run a free GTM Autopsy"
+  data-label="Run a free teardown"
   data-position="bottom-right"
   data-accent="#FFFF6A"
   defer
@@ -19,7 +19,7 @@ s.defer=true;
 document.body.appendChild(s);`;
 
 const CONFIG_ROWS = [
-  { attr: "data-label", default: "Run a free GTM Autopsy", desc: "Text on the launcher pill." },
+  { attr: "data-label", default: "Run a free teardown", desc: "Text on the launcher pill." },
   { attr: "data-position", default: "bottom-right", desc: "bottom-right · bottom-left · top-right · top-left" },
   { attr: "data-accent", default: "#FFFF6A", desc: "Launcher background. Any valid CSS color." },
   { attr: "data-auto", default: "false", desc: "If true, auto-opens 800ms after load." },
@@ -35,7 +35,7 @@ export default function InstallPage() {
         <section className="mb-14 md:mb-20">
           <div className="annotation mb-5">/ FOR THE HIVEMIND TEAM · 60-SECOND READ</div>
           <h1 className="display text-4xl leading-[0.95] md:text-6xl md:leading-[0.92]">
-            Install the GTM Autopsy
+            Install the GTM teardown
             <br />
             <em>widget.</em>
           </h1>
@@ -200,7 +200,7 @@ window.GTMAutopsy.isOpen();   // → boolean`}
                   label: "Look in the bottom-right corner",
                   body: (
                     <>
-                      Within ~1 second, a <strong style={{ color: "#FFFF6A" }}>yellow pill button</strong> appears in the bottom-right corner of the page. It reads <span className="kbd">★ NEW · Run a free GTM Autopsy →</span>. This is the launcher.
+                      Within ~1 second, a <strong style={{ color: "#FFFF6A" }}>yellow pill button</strong> appears in the bottom-right corner of the page. It reads <span className="kbd">★ NEW · Run a free teardown →</span>. This is the launcher.
                     </>
                   ),
                 },
@@ -208,7 +208,7 @@ window.GTMAutopsy.isOpen();   // → boolean`}
                   label: "Click the launcher",
                   body: (
                     <>
-                      The modal opens over the page. Try the full flow: fill in a sample company (or click <em style={{ color: "#FFFF6A", fontStyle: "normal" }}>/ Try a sample</em>) → press <span className="kbd">RUN AUTOPSY</span> → watch the six-step loading sequence → read the teaser report.
+                      The modal opens over the page. Try the full flow: fill in a sample company (or click <em style={{ color: "#FFFF6A", fontStyle: "normal" }}>/ Try a sample</em>) → press <span className="kbd">RUN TEARDOWN</span> → watch the six-step loading sequence → read the teaser report.
                     </>
                   ),
                 },
@@ -427,7 +427,7 @@ function TopBar() {
           </span>
           <span style={{ color: "rgba(255,255,255,0.25)", fontFamily: "var(--font-mono-stack)", fontSize: 11 }}>/</span>
           <span style={{ fontFamily: "var(--font-mono-stack)", fontSize: 11, fontWeight: 500, letterSpacing: "0.12em", color: "#fff" }}>
-            GTM AUTOPSY · INSTALL
+            GTM TEARDOWN · INSTALL
           </span>
         </a>
         <div className="hidden items-center gap-4 md:flex">
