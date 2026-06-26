@@ -417,10 +417,10 @@ function TeaserScreen(props: {
       <div style={{ position: "relative" }}>
         <div className="myo-locked" aria-hidden>
           <div className="myo-card">
-            <div className="myo-card-label">/ Rewritten hero · before → after</div>
+            <div className="myo-card-label">/ Positioning + hero · before → after</div>
             <p style={{ margin: "10px 0 0", fontSize: 14, color: "#fff", lineHeight: 1.5 }}>
-              Your homepage hero, rewritten in your founder voice — sharper, category-defining, and
-              built around the wedge the strategist found.
+              Your positioning and homepage hero, rewritten in your founder voice — sharper,
+              category-defining, and built around the wedge the strategist found.
             </p>
           </div>
           <div className="myo-card" style={{ marginTop: 12 }}>
@@ -437,8 +437,8 @@ function TeaserScreen(props: {
             / Unlock the full teardown
           </div>
           <div style={{ fontSize: 13, color: "rgba(255,255,255,0.85)", lineHeight: 1.5, marginBottom: 14 }}>
-            Hero rewrite, 5 X posts, LinkedIn, cold DM, and 3 growth experiments. Free — enter your
-            email to unlock.
+            Rewritten positioning + homepage hero, 5 X posts, a LinkedIn post, a cold DM, and 3
+            growth experiments — grounded in your real site. Free — enter your email to unlock.
           </div>
           <form onSubmit={props.onSubmitEmail} style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             <input
