@@ -4,8 +4,8 @@ import { useEffect, useState } from "react";
 import type { ReportV2, TeaserV2 } from "@/lib/types";
 import { initAnalytics, track } from "@/lib/analytics";
 
-const TEASER_STEPS = ["Reading your site", "Running GTM Architect diagnosis", "Scoring the teardown"];
-const FULL_STEPS = ["Finding the strategic wedge", "Rewriting hero + posts", "Compiling the full plan"];
+const TEASER_STEPS = ["GTM Architect reading your site", "Diagnosing the narrative", "Scoring against your category"];
+const FULL_STEPS = ["Strategist finding the wedge", "Ghostwriter rewriting in your voice", "The swarm compiling your plan"];
 
 const EXAMPLE_URL = "stripe.com";
 
@@ -189,8 +189,8 @@ function IdleScreen(props: {
         Stop sounding like <em>the category.</em>
       </h2>
       <p className="myo-lead" style={{ margin: "10px 0 18px" }}>
-        Paste your URL. Hivemind reads your site, diagnoses what&apos;s broken, and rewrites your
-        hero, grounded in your real copy. The teardown is free.
+        Paste your URL. The Hivemind swarm reads your site the way your market does, names what&apos;s
+        broken, and rewrites it. No flattery. The teardown is free.
       </p>
 
       <form onSubmit={props.onSubmit} style={{ display: "flex", flexDirection: "column", gap: 10 }}>
@@ -527,11 +527,11 @@ function FullScreen({
           <Asterisk size={20} color="#000" />
         </div>
         <div style={{ fontFamily: "var(--font-mono-stack)", fontSize: 20, fontWeight: 700, lineHeight: 1.15, textTransform: "uppercase", color: "#000" }}>
-          Want to dig into<br />this more?
+          Knowing what&apos;s broken<br />is the easy part.
         </div>
         <div style={{ fontSize: 12.5, color: "rgba(0,0,0,0.75)", lineHeight: 1.55, marginTop: 10 }}>
-          Create a free Hivemind account. This autopsy is already waiting in your workspace, ready
-          to turn into a full GTM plan.
+          Your autopsy is already in your Hivemind workspace. Bring in the swarm and turn it into the
+          full plan.
         </div>
         <a
           href={signupHref}
