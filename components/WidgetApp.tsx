@@ -361,7 +361,7 @@ function ScoreHeader({ teaser }: { teaser: TeaserV2 }) {
   const category = teaser.scan.category?.[0] || "GTM";
   return (
     <div style={{ display: "flex", alignItems: "stretch", border: "1px solid rgba(255,255,255,0.14)", borderRadius: 16, overflow: "hidden" }}>
-      <div style={{ width: 132, padding: 18, background: "linear-gradient(180deg, #1a1a1a 0%, #000 100%)", borderRight: "1px solid rgba(255,255,255,0.14)", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+      <div style={{ width: 132, padding: 18, background: "linear-gradient(180deg, #303030 0%, #1f1f1f 100%)", borderRight: "1px solid rgba(255,255,255,0.14)", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
         <div className="myo-card-label">/ Score</div>
         <div>
           <div style={{ fontFamily: "var(--font-mono-stack)", fontSize: 52, fontWeight: 700, lineHeight: 1, color: scoreColor }}>{score}</div>
@@ -603,11 +603,15 @@ function WidgetStyles() {
   return (
     <style jsx global>{`
       :root {
+        /* Brand-matched to the Hivemind app tokens (app/globals.css):
+           --primary #FFFF6A, --background #262626, --text-primary #F6F6F6,
+           --status-pink #FF29E8. */
         --myo-yellow: #ffff6a;
-        --myo-black: #000000;
-        --myo-white: #ffffff;
+        --myo-black: #262626;
+        --myo-white: #f6f6f6;
         --myo-blue: #6989fe;
         --myo-lime: #acfa52;
+        --myo-pink: #ff29e8;
         --myo-red: #ff2a38;
         --font-mono-stack: var(--font-mono), "Courier New", monospace;
         --font-body-stack: var(--font-body), "IBM Plex Sans", Arial, sans-serif;
