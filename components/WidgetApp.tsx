@@ -104,7 +104,7 @@ export function WidgetApp({ ctaUrl, ctaLabel }: { ctaUrl: string; ctaLabel: stri
         body: JSON.stringify({
           email: email.trim(),
           url: url.trim(),
-          scan: teaser.scan,
+          scan: teaser.scan ?? {},
           teaser,
           turnstileToken,
           referrer: typeof document !== "undefined" ? document.referrer || undefined : undefined,
@@ -357,8 +357,8 @@ function ScoreHeader({ teaser }: { teaser: TeaserV2 }) {
   const score = teaser.overallScore;
   const scoreColor = score >= 60 ? "#FFFF6A" : score >= 35 ? "#FFA22F" : "#FF2A38";
   const scoreLabel = score >= 60 ? "PASSING" : score >= 35 ? "WORK TO DO" : "CRITICAL";
-  const company = teaser.scan.projectName || "Your company";
-  const category = teaser.scan.category?.[0] || "GTM";
+  const company = teaser.scan?.projectName || "Your company";
+  const category = teaser.scan?.category?.[0] || "GTM";
   return (
     <div style={{ display: "flex", alignItems: "stretch", border: "1px solid rgba(255,255,255,0.14)", borderRadius: 16, overflow: "hidden" }}>
       <div style={{ width: 132, padding: 18, background: "linear-gradient(180deg, #303030 0%, #1f1f1f 100%)", borderRight: "1px solid rgba(255,255,255,0.14)", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
