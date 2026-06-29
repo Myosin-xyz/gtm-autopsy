@@ -320,8 +320,6 @@ export default function EmbedDemoPage() {
 {`<script
   src="https://gtm-autopsy.vercel.app/embed.js"
   data-label="Run a free teardown"
-  data-cta="https://myosin.xyz/hivemind#contact"
-  data-cta-label="Hire HiveMind →"
   data-position="bottom-right"
   data-accent="#FFFF6A"
   defer
@@ -405,8 +403,6 @@ export default function EmbedDemoPage() {
         src="/embed.js"
         strategy="afterInteractive"
         data-label="Run a free teardown"
-        data-cta="https://myosin.xyz/hivemind#contact"
-        data-cta-label="Hire HiveMind →"
         data-position="bottom-right"
         data-accent="#FFFF6A"
       />
