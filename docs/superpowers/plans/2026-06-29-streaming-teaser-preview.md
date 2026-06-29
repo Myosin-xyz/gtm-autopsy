@@ -91,50 +91,55 @@ async function collect(url: string, domain: string, d: TeaserStreamDeps) {
   return out
 }
 
-// encodeSseEvent emits the exact wire format.
-assert.equal(
-  encodeSseEvent({event: 'scan', data: {x: 1} as never}),
-  'event: scan\ndata: {"x":1}\n\n',
-)
+// The repo is CommonJS (no top-level await under tsx) — wrap async in main().
+async function main() {
+  // encodeSseEvent emits the exact wire format.
+  assert.equal(
+    encodeSseEvent({event: 'scan', data: {x: 1} as never}),
+    'event: scan\ndata: {"x":1}\n\n',
+  )
 
-// Miss path: scan event (no rawText) then teaser event (full scan), in order.
-const fresh = await collect('https://stripe.com', 'stripe.com', deps())
-assert.deepEqual(
-  fresh.map((e) => e.event),
-  ['scan', 'teaser'],
-)
-assert.ok(!('rawText' in (fresh[0].data as object)), 'scan event omits rawText')
-assert.equal((fresh[0].data as {projectName: string}).projectName, 'Stripe')
-assert.equal((fresh[1].data as {overallScore: number}).overallScore, 72)
-assert.equal((fresh[1].data as {scan: AutopsyScan}).scan.rawText, 'lots of on-page text')
+  // Miss path: scan event (no rawText) then teaser event (full scan), in order.
+  const fresh = await collect('https://stripe.com', 'stripe.com', deps())
+  assert.deepEqual(fresh.map((e) => e.event), ['scan', 'teaser'])
+  assert.ok(!('rawText' in (fresh[0].data as object)), 'scan event omits rawText')
+  assert.equal((fresh[0].data as {projectName: string}).projectName, 'Stripe')
+  assert.equal((fresh[1].data as {overallScore: number}).overallScore, 72)
+  assert.equal((fresh[1].data as {scan: AutopsyScan}).scan.rawText, 'lots of on-page text')
 
-// Miss path caches the full payload exactly once.
-let cachedPayload: unknown = null
-await collect('https://stripe.com', 'stripe.com', deps({setCached: async (_d, p) => {cachedPayload = p}}))
-assert.equal((cachedPayload as {overallScore: number}).overallScore, 72)
+  // Miss path caches the full payload exactly once.
+  let cachedPayload: unknown = null
+  await collect('https://stripe.com', 'stripe.com', deps({setCached: async (_d, p) => {cachedPayload = p}}))
+  assert.equal((cachedPayload as {overallScore: number}).overallScore, 72)
 
-// Cache hit: emit scan + teaser immediately, never scan/diagnose/rate-check.
-let scanned = false
-const hitDeps = deps({
-  getCached: async () => ({...TEASER, scan: SCAN}),
-  scan: async () => {scanned = true; return SCAN},
-  rateOk: async () => {throw new Error('should not rate-check on hit')},
+  // Cache hit: emit scan + teaser immediately, never scan/diagnose/rate-check.
+  let scanned = false
+  const hitDeps = deps({
+    getCached: async () => ({...TEASER, scan: SCAN}),
+    scan: async () => {scanned = true; return SCAN},
+    rateOk: async () => {throw new Error('should not rate-check on hit')},
+  })
+  const hit = await collect('https://stripe.com', 'stripe.com', hitDeps)
+  assert.deepEqual(hit.map((e) => e.event), ['scan', 'teaser'])
+  assert.equal(scanned, false, 'cache hit must not re-scan')
+
+  // Rate limited: single error event.
+  const limited = await collect('https://stripe.com', 'stripe.com', deps({rateOk: async () => false}))
+  assert.deepEqual(limited.map((e) => e.event), ['error'])
+  assert.equal((limited[0].data as {error: string}).error, 'rate_limited')
+
+  // Scan throws: error event, no teaser.
+  const broken = await collect('https://x.com', 'x.com', deps({scan: async () => {throw new Error('boom')}}))
+  assert.deepEqual(broken.map((e) => e.event), ['error'])
+  assert.equal((broken[0].data as {error: string}).error, 'scan_failed')
+
+  console.log('teaser-stream: passed')
+}
+
+main().catch((e) => {
+  console.error(e)
+  process.exit(1)
 })
-const hit = await collect('https://stripe.com', 'stripe.com', hitDeps)
-assert.deepEqual(hit.map((e) => e.event), ['scan', 'teaser'])
-assert.equal(scanned, false, 'cache hit must not re-scan')
-
-// Rate limited: single error event.
-const limited = await collect('https://stripe.com', 'stripe.com', deps({rateOk: async () => false}))
-assert.deepEqual(limited.map((e) => e.event), ['error'])
-assert.equal((limited[0].data as {error: string}).error, 'rate_limited')
-
-// Scan throws: error event, no teaser.
-const broken = await collect('https://x.com', 'x.com', deps({scan: async () => {throw new Error('boom')}}))
-assert.deepEqual(broken.map((e) => e.event), ['error'])
-assert.equal((broken[0].data as {error: string}).error, 'scan_failed')
-
-console.log('teaser-stream: passed')
 ```
 
 - [ ] **Step 2: Run test to verify it fails**
@@ -326,7 +331,9 @@ export async function POST(request: NextRequest) {
       },
     })
 
-    return new Response(stream, {
+    // NextResponse (not Response) — withLeadsAuth's callback is typed to return
+    // NextResponse; it accepts a ReadableStream body.
+    return new NextResponse(stream, {
       headers: {
         ...cors,
         'Content-Type': 'text/event-stream; charset=utf-8',
