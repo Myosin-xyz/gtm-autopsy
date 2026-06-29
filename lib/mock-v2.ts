@@ -8,9 +8,11 @@ import type { AutopsyInput, TeaserV2 } from "./types";
 
 function inputFor(url: string): AutopsyInput {
   const domain = normalizeDomain(url) ?? "example.com";
+  // Seed from the canonical domain so buildMockReport (which hashes websiteUrl)
+  // returns the same mock teaser for foo.com, https://foo.com/, www.foo.com, etc.
   return {
     companyName: companyNameFromDomain(domain),
-    websiteUrl: /^https?:\/\//i.test(url) ? url : `https://${url}`,
+    websiteUrl: `https://${domain}`,
     category: "other",
   };
 }
@@ -34,4 +36,3 @@ export function mockTeaserV2(url: string): TeaserV2 {
     },
   };
 }
-
