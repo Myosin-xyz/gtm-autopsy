@@ -185,14 +185,6 @@ function IdleScreen(props: {
 }) {
   return (
     <div>
-      <h2 className="myo-display" style={{ fontSize: 26 }}>
-        Stop sounding like <em>the category.</em>
-      </h2>
-      <p className="myo-lead" style={{ margin: "10px 0 18px" }}>
-        Paste your URL. The Hivemind swarm reads your site the way your market does, names what&apos;s
-        broken, and rewrites it. No flattery. The teardown is free.
-      </p>
-
       <form onSubmit={props.onSubmit} style={{ display: "flex", flexDirection: "column", gap: 10 }}>
         <div className="myo-label">/ Company URL</div>
         <input
