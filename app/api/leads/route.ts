@@ -1,6 +1,5 @@
 import { createHash } from "node:crypto";
 import { NextResponse } from "next/server";
-import { verifyTurnstile } from "@/lib/turnstile";
 import { isDisposableEmail } from "@/lib/disposable-email";
 import { hasHivemindCredentials } from "@/lib/hivemind";
 import type { AutopsyScanV2, TeaserV2 } from "@/lib/types";
@@ -31,7 +30,6 @@ export async function POST(req: Request) {
     url?: string;
     scan?: AutopsyScanV2;
     teaser?: TeaserV2;
-    turnstileToken?: string;
     utm?: Record<string, string>;
     referrer?: string;
   };
@@ -48,8 +46,6 @@ export async function POST(req: Request) {
   if (!body.url) return NextResponse.json({ error: "missing_url" }, { status: 400 });
 
   const ip = clientIp(req);
-  const human = await verifyTurnstile(body.turnstileToken, ip);
-  if (!human) return NextResponse.json({ error: "turnstile_failed" }, { status: 403 });
 
   if (!hasHivemindCredentials()) {
     if (MOCK_MODE) {
@@ -72,8 +68,6 @@ export async function POST(req: Request) {
         url: body.url,
         scan: body.scan,
         teaser: body.teaser,
-        // Turnstile is verified above; the token is single-use, so don't forward
-        // the now-consumed token (a re-verify downstream would reject it).
         ip_hash: ipHash,
         utm_source: body.utm?.utm_source ?? null,
         utm_medium: body.utm?.utm_medium ?? null,

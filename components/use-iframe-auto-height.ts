@@ -7,7 +7,7 @@ import { useEffect } from "react";
 //      shell + internal scroll — otherwise scrollHeight reports the viewport
 //      height (a tall iframe with empty space), not the content.
 //   2. postMessage { type: "iframe-resize", height } on load, on every layout
-//      change (ResizeObserver), and on a few timers (async fonts / Turnstile).
+//      change (ResizeObserver), and on a few timers (async fonts / teaser).
 // Parent listens for that message shape and sets iframe.style.height.
 export function useIframeAutoHeight() {
   useEffect(() => {
@@ -34,7 +34,7 @@ export function useIframeAutoHeight() {
     observer.observe(root);
     observer.observe(document.body);
 
-    // Catch late layout shifts: web-font swap, Turnstile iframe, async teaser.
+    // Catch late layout shifts: web-font swap, async teaser.
     const timers = [100, 500, 1000].map((ms) =>
       window.setTimeout(sendHeight, ms),
     );

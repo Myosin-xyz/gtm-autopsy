@@ -29,8 +29,6 @@ function errorCopy(err: string): string {
       return "/ ERROR: Enter a valid email";
     case "disposable_email":
       return "/ ERROR: Use a real work email";
-    case "turnstile_failed":
-      return "/ ERROR: Verification failed. Try again";
     default:
       return `/ ERROR: ${err}`;
   }
@@ -46,7 +44,6 @@ export function WidgetApp() {
   const [url, setUrl] = useState("");
   const [email, setEmail] = useState("");
   const [teaser, setTeaser] = useState<TeaserV2 | null>(null);
-  const [turnstileToken, setTurnstileToken] = useState<string | undefined>(undefined);
 
   useEffect(() => {
     initAnalytics();
@@ -105,7 +102,6 @@ export function WidgetApp() {
           url: url.trim(),
           scan: teaser.scan ?? {},
           teaser,
-          turnstileToken,
           referrer: typeof document !== "undefined" ? document.referrer || undefined : undefined,
           utm:
             typeof window !== "undefined"
@@ -137,7 +133,6 @@ export function WidgetApp() {
     setUrl("");
     setEmail("");
     setTeaser(null);
-    setTurnstileToken(undefined);
     setStepIdx(0);
     setError(null);
   }
@@ -160,7 +155,6 @@ export function WidgetApp() {
             email={email}
             setEmail={setEmail}
             onSubmitEmail={submitEmail}
-            setTurnstileToken={setTurnstileToken}
             error={error}
           />
         )}
@@ -358,7 +352,6 @@ function TeaserScreen(props: {
   email: string;
   setEmail: (s: string) => void;
   onSubmitEmail: (e: React.FormEvent) => void;
-  setTurnstileToken: (t: string | undefined) => void;
   error: string | null;
 }) {
   const { teaser } = props;
@@ -404,43 +397,12 @@ function TeaserScreen(props: {
               maxLength={200}
               required
             />
-            <Turnstile onToken={props.setTurnstileToken} />
             {props.error && <div className="myo-error">{errorCopy(props.error)}</div>}
             <button type="submit" className="myo-btn-primary">UNLOCK THE FULL TEARDOWN →</button>
           </form>
         </div>
       </div>
     </div>
-  );
-}
-
-function Turnstile({ onToken }: { onToken: (t: string | undefined) => void }) {
-  const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
-  useEffect(() => {
-    if (!siteKey) return;
-    const id = "cf-turnstile-script";
-    if (!document.getElementById(id)) {
-      const s = document.createElement("script");
-      s.id = id;
-      s.src = "https://challenges.cloudflare.com/turnstile/v0/api.js";
-      s.async = true;
-      s.defer = true;
-      document.head.appendChild(s);
-    }
-  }, [siteKey]);
-  if (!siteKey) return null;
-  return (
-    <div
-      className="cf-turnstile"
-      data-sitekey={siteKey}
-      ref={(el) => {
-        const ts = (window as unknown as { turnstile?: { render: (e: HTMLElement, o: unknown) => void } }).turnstile;
-        if (el && ts && !el.dataset.rendered) {
-          el.dataset.rendered = "1";
-          ts.render(el, { callback: (t: string) => onToken(t) });
-        }
-      }}
-    />
   );
 }
 
