@@ -219,7 +219,7 @@ function ScanFailedScreen(props: {
   return (
     <div>
       <div className="myo-kicker" style={{ color: "var(--myo-red)" }}>/ COULDN&apos;T READ YOUR SITE</div>
-      <h3 className="myo-display" style={{ fontSize: 22 }}>Give it another shot.</h3>
+      <h3 className="myo-display" style={{ fontSize: 29 }}>Give it another shot.</h3>
       <p className="myo-lead" style={{ margin: "10px 0 18px" }}>
         We couldn&apos;t scrape that URL. It might be down, blocking bots, or just mistyped. Check it
         and run it again.
@@ -254,7 +254,7 @@ function LoadingScreen({ steps, idx, title }: { steps: string[]; idx: number; ti
         <span className="myo-pulse-dot" />
         / RUNNING
       </div>
-      <h3 className="myo-display" style={{ fontSize: 24 }}>{title}</h3>
+      <h3 className="myo-display" style={{ fontSize: 31 }}>{title}</h3>
       <ol style={{ listStyle: "none", padding: 0, margin: "20px 0 0", display: "flex", flexDirection: "column", gap: 0 }}>
         {steps.map((label, i) => {
           const state = i < idx ? "done" : i === idx ? "active" : "pending";
@@ -272,7 +272,7 @@ function LoadingScreen({ steps, idx, title }: { steps: string[]; idx: number; ti
               <span
                 style={{
                   fontFamily: "var(--font-mono-stack)",
-                  fontSize: 10,
+                  fontSize: 13,
                   fontWeight: 700,
                   color: state === "done" ? "var(--myo-lime)" : state === "active" ? "#fff" : "rgba(255,255,255,0.3)",
                   width: 28,
@@ -281,7 +281,7 @@ function LoadingScreen({ steps, idx, title }: { steps: string[]; idx: number; ti
                 {String(i + 1).padStart(2, "0")}
               </span>
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: 13.5, color: state === "pending" ? "rgba(255,255,255,0.35)" : "#fff", fontWeight: 500 }}>
+                <div style={{ fontSize: 18, color: state === "pending" ? "rgba(255,255,255,0.35)" : "#fff", fontWeight: 500 }}>
                   {label}
                 </div>
                 {state === "active" && (
@@ -290,7 +290,7 @@ function LoadingScreen({ steps, idx, title }: { steps: string[]; idx: number; ti
                   </div>
                 )}
               </div>
-              <span style={{ fontFamily: "var(--font-mono-stack)", fontSize: 9.5, color: state === "done" ? "var(--myo-lime)" : "rgba(255,255,255,0.35)" }}>
+              <span style={{ fontFamily: "var(--font-mono-stack)", fontSize: 12, color: state === "done" ? "var(--myo-lime)" : "rgba(255,255,255,0.35)" }}>
                 {state === "done" ? "✓ OK" : state === "active" ? "..." : ""}
               </span>
             </li>
@@ -312,17 +312,17 @@ function ScoreHeader({ teaser }: { teaser: TeaserV2 }) {
       <div style={{ width: 132, padding: 18, background: "linear-gradient(180deg, #303030 0%, #1f1f1f 100%)", borderRight: "1px solid rgba(255,255,255,0.14)", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
         <div className="myo-card-label">/ Score</div>
         <div>
-          <div style={{ fontFamily: "var(--font-mono-stack)", fontSize: 52, fontWeight: 700, lineHeight: 1, color: scoreColor }}>{score}</div>
-          <div style={{ fontFamily: "var(--font-mono-stack)", fontSize: 9, color: "rgba(255,255,255,0.5)", marginTop: 4 }}>/ 100</div>
+          <div style={{ fontFamily: "var(--font-mono-stack)", fontSize: 68, fontWeight: 700, lineHeight: 1, color: scoreColor }}>{score}</div>
+          <div style={{ fontFamily: "var(--font-mono-stack)", fontSize: 12, color: "rgba(255,255,255,0.5)", marginTop: 4 }}>/ 100</div>
         </div>
-        <div style={{ fontFamily: "var(--font-mono-stack)", fontSize: 9.5, fontWeight: 700, letterSpacing: "0.14em", color: scoreColor }}>{scoreLabel}</div>
+        <div style={{ fontFamily: "var(--font-mono-stack)", fontSize: 12, fontWeight: 700, letterSpacing: "0.14em", color: scoreColor }}>{scoreLabel}</div>
       </div>
       <div style={{ flex: 1, padding: 18, display: "flex", flexDirection: "column", justifyContent: "space-between", minWidth: 0 }}>
         <div>
           <div className="myo-card-label">/ {category}</div>
-          <div style={{ fontFamily: "var(--font-mono-stack)", fontSize: 18, fontWeight: 700, marginTop: 6, textTransform: "uppercase" }}>{company}</div>
+          <div style={{ fontFamily: "var(--font-mono-stack)", fontSize: 23, fontWeight: 700, marginTop: 6, textTransform: "uppercase" }}>{company}</div>
         </div>
-        <div style={{ fontSize: 12.5, color: "rgba(255,255,255,0.78)", lineHeight: 1.5, marginTop: 10 }}>{teaser.verdict}</div>
+        <div style={{ fontSize: 16, color: "rgba(255,255,255,0.78)", lineHeight: 1.5, marginTop: 10 }}>{teaser.verdict}</div>
       </div>
     </div>
   );
@@ -337,8 +337,8 @@ function WhatsBroken({ items, max }: { items: string[]; max: number }) {
       </div>
       <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
         {items.slice(0, max).map((b, i) => (
-          <li key={i} style={{ display: "flex", gap: 14, padding: "11px 0", borderTop: i === 0 ? "0" : "1px solid rgba(255,255,255,0.08)", fontSize: 13, color: "#fff", lineHeight: 1.5 }}>
-            <span style={{ fontFamily: "var(--font-mono-stack)", fontSize: 10, fontWeight: 700, color: "#FF2A38", flexShrink: 0, paddingTop: 2 }}>0{i + 1}</span>
+          <li key={i} style={{ display: "flex", gap: 14, padding: "11px 0", borderTop: i === 0 ? "0" : "1px solid rgba(255,255,255,0.08)", fontSize: 17, color: "#fff", lineHeight: 1.5 }}>
+            <span style={{ fontFamily: "var(--font-mono-stack)", fontSize: 13, fontWeight: 700, color: "#FF2A38", flexShrink: 0, paddingTop: 2 }}>0{i + 1}</span>
             <span>{b}</span>
           </li>
         ))}
@@ -365,14 +365,14 @@ function TeaserScreen(props: {
         <div className="myo-locked" aria-hidden>
           <div className="myo-card">
             <div className="myo-card-label">/ Positioning + hero · before → after</div>
-            <p style={{ margin: "10px 0 0", fontSize: 14, color: "#fff", lineHeight: 1.5 }}>
+            <p style={{ margin: "10px 0 0", fontSize: 18, color: "#fff", lineHeight: 1.5 }}>
               Your positioning and homepage hero, rewritten in your founder voice. Sharper,
               category-defining, built around the wedge the strategist found.
             </p>
           </div>
           <div className="myo-card" style={{ marginTop: 12 }}>
             <div className="myo-card-label">/ 5 X posts · LinkedIn · cold DM · 3 growth experiments</div>
-            <p style={{ margin: "10px 0 0", fontSize: 13, color: "rgba(255,255,255,0.8)", lineHeight: 1.6 }}>
+            <p style={{ margin: "10px 0 0", fontSize: 17, color: "rgba(255,255,255,0.8)", lineHeight: 1.6 }}>
               Five ready-to-post launch tweets, a LinkedIn post, a cold DM that doesn&apos;t pitch, and
               three growth experiments. All grounded in your real site.
             </p>
@@ -380,10 +380,10 @@ function TeaserScreen(props: {
         </div>
 
         <div className="myo-gate">
-          <div style={{ fontFamily: "var(--font-mono-stack)", fontSize: 10, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--myo-pink)", marginBottom: 8 }}>
+          <div style={{ fontFamily: "var(--font-mono-stack)", fontSize: 13, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--myo-pink)", marginBottom: 8 }}>
             / Unlock the full teardown
           </div>
-          <div style={{ fontSize: 13, color: "rgba(255,255,255,0.85)", lineHeight: 1.5, marginBottom: 14 }}>
+          <div style={{ fontSize: 17, color: "rgba(255,255,255,0.85)", lineHeight: 1.5, marginBottom: 14 }}>
             Rewritten positioning and homepage hero, 5 X posts, a LinkedIn post, a cold DM, and 3
             growth experiments, all grounded in your real site. Free. Enter your email to unlock.
           </div>
@@ -410,7 +410,7 @@ function EmailSentScreen({ email, onReset }: { email: string; onReset: () => voi
   return (
     <div>
       <div className="myo-kicker" style={{ color: "var(--myo-lime)" }}>/ CHECK YOUR INBOX</div>
-      <h3 className="myo-display" style={{ fontSize: 24 }}>Your teardown is on its way.</h3>
+      <h3 className="myo-display" style={{ fontSize: 31 }}>Your teardown is on its way.</h3>
       <p className="myo-lead" style={{ margin: "10px 0 18px" }}>
         We&apos;re building your full teardown now and sending it to {email}. Open the email to read
         the rewrite, the posts, and the plan.
@@ -430,7 +430,7 @@ function LimitReachedScreen({ email, onReset }: { email: string; onReset: () => 
   return (
     <div>
       <div className="myo-kicker" style={{ color: "var(--myo-pink)" }}>/ ONE FREE TEARDOWN PER EMAIL</div>
-      <h3 className="myo-display" style={{ fontSize: 24 }}>You&apos;ve used your free teardown.</h3>
+      <h3 className="myo-display" style={{ fontSize: 31 }}>You&apos;ve used your free teardown.</h3>
       <p className="myo-lead" style={{ margin: "10px 0 18px" }}>
         {email} already has a teardown on the way. Want to run them on more sites? Create a free
         Hivemind account to onboard your projects and put the swarm to work on all of them.
@@ -480,28 +480,28 @@ function WidgetStyles() {
       html[data-embedded] .myo-body { flex: none; overflow-y: visible; }
       .myo-body::-webkit-scrollbar { width: 6px; }
       .myo-body::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 6px; }
-      .myo-kicker { font-family: var(--font-mono-stack); font-size: 10px; letter-spacing: 0.18em; color: rgba(255,255,255,0.45); text-transform: uppercase; margin-bottom: 14px; }
-      .myo-display { font-family: var(--font-mono-stack); font-weight: 700; font-size: 26px; line-height: 1.0; letter-spacing: -0.01em; text-transform: uppercase; color: var(--myo-white); margin: 0; }
+      .myo-kicker { font-family: var(--font-mono-stack); font-size: 13px; letter-spacing: 0.18em; color: rgba(255,255,255,0.45); text-transform: uppercase; margin-bottom: 14px; }
+      .myo-display { font-family: var(--font-mono-stack); font-weight: 700; font-size: 34px; line-height: 1.0; letter-spacing: -0.01em; text-transform: uppercase; color: var(--myo-white); margin: 0; }
       .myo-display em { font-style: normal; color: var(--myo-pink); }
-      .myo-lead { font-family: var(--font-body-stack); font-size: 13.5px; line-height: 1.55; color: rgba(255,255,255,0.7); margin: 14px 0 22px; }
-      .myo-label { font-family: var(--font-mono-stack); font-size: 10px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(255,255,255,0.55); margin-bottom: 8px; }
-      .myo-input { width: 100%; background: transparent; border: 0; border-bottom: 1px solid rgba(255,255,255,0.25); padding: 10px 0; color: var(--myo-white); font-size: 15px; font-family: var(--font-body-stack); transition: border-color 120ms ease; border-radius: 0; }
+      .myo-lead { font-family: var(--font-body-stack); font-size: 18px; line-height: 1.55; color: rgba(255,255,255,0.7); margin: 14px 0 22px; }
+      .myo-label { font-family: var(--font-mono-stack); font-size: 13px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(255,255,255,0.55); margin-bottom: 8px; }
+      .myo-input { width: 100%; background: transparent; border: 0; border-bottom: 1px solid rgba(255,255,255,0.25); padding: 10px 0; color: var(--myo-white); font-size: 20px; font-family: var(--font-body-stack); transition: border-color 120ms ease; border-radius: 0; }
       .myo-input::placeholder { color: rgba(255,255,255,0.35); }
       .myo-input:focus { outline: none; border-bottom-color: var(--myo-pink); }
       /* Matches the Hivemind "Hire Hivemind" button from Framer: cream pill,
          inner pink glow, 1px pink border. */
-      .myo-btn-primary { width: 100%; box-sizing: border-box; background-color: #d7d6c8; color: #1a1320; font-family: var(--font-mono-stack); font-weight: 700; font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; text-align: center; padding: 16px 25px; border: 1px solid var(--myo-pink); border-radius: 999px; box-shadow: inset 0 0 25px 0 #ff337e; cursor: pointer; transition: box-shadow 140ms ease, transform 140ms ease; }
+      .myo-btn-primary { width: 100%; box-sizing: border-box; background-color: #d7d6c8; color: #1a1320; font-family: var(--font-mono-stack); font-weight: 700; font-size: 16px; letter-spacing: 0.14em; text-transform: uppercase; text-align: center; padding: 16px 25px; border: 1px solid var(--myo-pink); border-radius: 999px; box-shadow: inset 0 0 25px 0 #ff337e; cursor: pointer; transition: box-shadow 140ms ease, transform 140ms ease; }
       .myo-btn-primary:hover { box-shadow: inset 0 0 34px 0 #ff337e; transform: translateY(-1px); }
-      .myo-text-link { background: transparent; border: 0; color: rgba(255,255,255,0.5); font-family: var(--font-mono-stack); font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; padding: 4px 0; text-align: center; transition: color 120ms ease; }
+      .myo-text-link { background: transparent; border: 0; color: rgba(255,255,255,0.5); font-family: var(--font-mono-stack); font-size: 14px; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; padding: 4px 0; text-align: center; transition: color 120ms ease; }
       .myo-text-link:hover { color: var(--myo-pink); }
       .myo-card { border: 1px solid rgba(255,255,255,0.12); border-radius: 16px; padding: 18px; background: rgba(255,255,255,0.02); position: relative; }
-      .myo-card-label { font-family: var(--font-mono-stack); font-size: 10px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(255,255,255,0.5); }
+      .myo-card-label { font-family: var(--font-mono-stack); font-size: 13px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(255,255,255,0.5); }
       .myo-cta-card { position: relative; border: 1px solid rgba(255,41,232,0.3); border-radius: 16px; padding: 22px; background: rgba(255,41,232,0.05); box-shadow: 0 0 44px rgba(232,31,201,0.14); overflow: hidden; }
-      .myo-error { font-family: var(--font-mono-stack); font-size: 11px; color: #ff2a38; padding: 8px 0; border-top: 1px solid rgba(255,42,56,0.4); border-bottom: 1px solid rgba(255,42,56,0.4); letter-spacing: 0.08em; text-transform: uppercase; }
+      .myo-error { font-family: var(--font-mono-stack); font-size: 14px; color: #ff2a38; padding: 8px 0; border-top: 1px solid rgba(255,42,56,0.4); border-bottom: 1px solid rgba(255,42,56,0.4); letter-spacing: 0.08em; text-transform: uppercase; }
       .myo-locked { position: absolute; inset: 0; overflow: hidden; filter: blur(7px); pointer-events: none; user-select: none; opacity: 0.55; }
       .myo-gate { position: relative; display: flex; flex-direction: column; justify-content: center; padding: 22px; border-radius: 16px; background: linear-gradient(180deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.85) 100%); border: 1px solid rgba(255,41,232,0.4); }
-      .myo-unlocked-banner { font-family: var(--font-mono-stack); font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--myo-lime); border: 1px solid rgba(172,250,82,0.4); border-radius: 999px; padding: 8px 14px; text-align: center; }
-      .myo-reset-btn { width: 100%; margin-top: 10px; padding: 11px 16px; background: transparent; border: 1px solid rgba(255,255,255,0.2); color: rgba(255,255,255,0.55); font-family: var(--font-mono-stack); font-weight: 500; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer; border-radius: 999px; transition: color 120ms ease, border-color 120ms ease; }
+      .myo-unlocked-banner { font-family: var(--font-mono-stack); font-size: 14px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--myo-lime); border: 1px solid rgba(172,250,82,0.4); border-radius: 999px; padding: 8px 14px; text-align: center; }
+      .myo-reset-btn { width: 100%; margin-top: 10px; padding: 11px 16px; background: transparent; border: 1px solid rgba(255,255,255,0.2); color: rgba(255,255,255,0.55); font-family: var(--font-mono-stack); font-weight: 500; font-size: 14px; letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer; border-radius: 999px; transition: color 120ms ease, border-color 120ms ease; }
       .myo-reset-btn:hover { color: var(--myo-white); border-color: rgba(255,255,255,0.4); }
       .myo-pulse-dot { width: 7px; height: 7px; border-radius: 999px; background: var(--myo-pink); display: inline-block; animation: myoPulse 1.4s ease-in-out infinite; }
       .myo-shimmer-bar { height: 100%; width: 100%; background: linear-gradient(90deg, transparent, var(--myo-pink), transparent); background-size: 200% 100%; animation: myoShimmer 1.2s linear infinite; }
