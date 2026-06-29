@@ -16,10 +16,15 @@ function clientIp(req: Request): string {
 }
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+// Mock only in local dev. In production a missing key is a config error, not a
+// reason to fake a successful enqueue and silently drop the lead.
+const MOCK_MODE = process.env.NODE_ENV !== "production";
+
 // Email gate → hive-mind v2 lead endpoint. Forwards the `email`, `scan`, and
 // `teaser` the widget already has so hive-mind generates + emails the full
 // teardown in the background (grounded, placeholder-owned project). Returns
-// { ok, status }. Mock fallback (no credentials) returns { ok: true, status: "generating" }.
+// { ok, status }. Mock fallback (dev only) returns { ok: true, status: "generating" };
+// a missing key in production fails closed (503).
 export async function POST(req: Request) {
   let body: {
     email?: string;
@@ -47,10 +52,13 @@ export async function POST(req: Request) {
   if (!human) return NextResponse.json({ error: "turnstile_failed" }, { status: 403 });
 
   if (!hasHivemindCredentials()) {
-    return NextResponse.json({ ok: true, status: "generating" });
+    if (MOCK_MODE) {
+      return NextResponse.json({ ok: true, status: "generating" });
+    }
+    return NextResponse.json({ error: "service_unconfigured" }, { status: 503 });
   }
 
-  const ipHash = createHash("sha256").update(`${clientIp(req)}:gtm-autopsy`).digest("hex");
+  const ipHash = createHash("sha256").update(`${ip}:gtm-autopsy`).digest("hex");
 
   try {
     const res = await fetch(`${BASE_URL}/api/v1/teardown/lead`, {
@@ -64,7 +72,8 @@ export async function POST(req: Request) {
         url: body.url,
         scan: body.scan,
         teaser: body.teaser,
-        turnstileToken: body.turnstileToken,
+        // Turnstile is verified above; the token is single-use, so don't forward
+        // the now-consumed token (a re-verify downstream would reject it).
         ip_hash: ipHash,
         utm_source: body.utm?.utm_source ?? null,
         utm_medium: body.utm?.utm_medium ?? null,

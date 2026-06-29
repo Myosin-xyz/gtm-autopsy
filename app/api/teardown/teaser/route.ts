@@ -10,6 +10,10 @@ export const runtime = "nodejs";
 const BASE_URL =
   process.env.HIVEMIND_API_BASE_URL?.replace(/\/$/, "") || "https://hivemind.myosin.xyz";
 
+// Mock only in local dev. In production a missing key is a config error, not a
+// reason to serve fake teaser data to real users.
+const MOCK_MODE = process.env.NODE_ENV !== "production";
+
 function clientIp(req: Request): string {
   return req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "0.0.0.0";
 }
@@ -17,8 +21,8 @@ function clientIp(req: Request): string {
 // Thin proxy → hive-mind v2 grounded teaser. The hive-mind endpoint scrapes the
 // site, runs the GTM Architect diagnosis, and handles its own domain cache +
 // per-IP rate limit. With no HIVEMIND_API_KEY we degrade to a deterministic mock
-// so `npm run dev` works offline. Returns { teaser } where teaser includes the
-// `scan` the lead call needs (so we never re-scrape).
+// (local dev only) so `npm run dev` works offline. Returns { teaser } where teaser
+// includes the `scan` the lead call needs (so we never re-scrape).
 export async function POST(req: Request) {
   let body: { url?: string };
   try {
@@ -31,7 +35,10 @@ export async function POST(req: Request) {
   if (!domain) return NextResponse.json({ error: "invalid_url" }, { status: 400 });
 
   if (!hasHivemindCredentials()) {
-    return NextResponse.json({ teaser: mockTeaserV2(body.url!), cached: false });
+    if (MOCK_MODE) {
+      return NextResponse.json({ teaser: mockTeaserV2(body.url!), cached: false });
+    }
+    return NextResponse.json({ error: "service_unconfigured" }, { status: 503 });
   }
 
   const ipHash = createHash("sha256").update(`${clientIp(req)}:gtm-autopsy`).digest("hex");
