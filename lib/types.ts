@@ -49,21 +49,24 @@ export interface HivemindTraceStep {
   sources?: { title: string; author?: string }[];
 }
 
-export interface TeaserResult {
-  input: AutopsyInput;
+// ── v2 shapes (grounded; produced by the hive-mind autopsy endpoints) ──────
+
+export interface AutopsyScanV2 {
+  projectName: string;
+  description: string;
+  category: string[];
+  socialHandles: Record<string, string>;
+  audiences: string[];
+  channels: string[];
+  rawText?: string;
+}
+
+export interface TeaserV2 {
   overallScore: number;
   verdict: string;
   scorecard: ScoreCard;
   whatsBroken: string[];
-  trace: AutopsyReport["trace"];
-  generatedAt: string;
-}
-
-export interface GateMeta {
-  utmSource?: string;
-  utmMedium?: string;
-  utmCampaign?: string;
-  referrer?: string;
+  scan: AutopsyScanV2;
 }
 
 export interface AutopsyReport {

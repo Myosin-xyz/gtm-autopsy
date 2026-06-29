@@ -5,9 +5,7 @@ import { Logo, Asterisk } from "@/components/Logo";
 
 const FULL_SNIPPET = `<script
   src="https://gtm-autopsy.vercel.app/embed.js"
-  data-label="Run a free GTM Autopsy"
-  data-cta="https://myosin.xyz/hivemind#contact"
-  data-cta-label="Hire HiveMind →"
+  data-label="Run a free teardown"
   data-position="bottom-right"
   data-accent="#FFFF6A"
   defer
@@ -21,11 +19,9 @@ s.defer=true;
 document.body.appendChild(s);`;
 
 const CONFIG_ROWS = [
-  { attr: "data-label", default: "Run a free GTM Autopsy", desc: "Text on the launcher pill." },
+  { attr: "data-label", default: "Run a free teardown", desc: "Text on the launcher pill." },
   { attr: "data-position", default: "bottom-right", desc: "bottom-right · bottom-left · top-right · top-left" },
   { attr: "data-accent", default: "#FFFF6A", desc: "Launcher background. Any valid CSS color." },
-  { attr: "data-cta", default: "current page #contact", desc: "Where the 'Hire HiveMind' button inside the report links to." },
-  { attr: "data-cta-label", default: "Hire HiveMind →", desc: "Text of that CTA." },
   { attr: "data-auto", default: "false", desc: "If true, auto-opens 800ms after load." },
 ];
 
@@ -39,19 +35,19 @@ export default function InstallPage() {
         <section className="mb-14 md:mb-20">
           <div className="annotation mb-5">/ FOR THE HIVEMIND TEAM · 60-SECOND READ</div>
           <h1 className="display text-4xl leading-[0.95] md:text-6xl md:leading-[0.92]">
-            Install the GTM Autopsy
+            Install the GTM teardown
             <br />
             <em>widget.</em>
           </h1>
           <p className="mt-6 max-w-2xl text-lg leading-relaxed text-white/70">
-            One line of HTML. The yellow launcher appears on every page it loads on. Click → the full diagnostic opens in a modal. Sandboxed, idempotent, ~5KB, no dependencies.
+            One line of HTML. The yellow launcher appears on every page it loads on. Click → the teardown opens in a modal: a grounded teaser, then an email gate that delivers the full teardown by email. Sandboxed, idempotent, ~5KB, no dependencies.
           </p>
         </section>
 
         <Section label="/ 01 · Paste this" title="One line. Anywhere before </body>.">
           <CodeBlock code={MIN_SNIPPET} />
           <p className="mt-5 text-sm leading-relaxed text-white/65">
-            That's the minimum. Done. The launcher uses Hivemind-yellow by default, the report CTA defaults to <span className="kbd">Hire HiveMind →</span> linking to <span className="kbd">{`{current-page}#contact`}</span>, and the modal closes on overlay click, <span className="kbd">Esc</span>, or the × button.
+            That's the minimum. Done. The launcher uses Hivemind-yellow by default, and the modal closes on overlay click, <span className="kbd">Esc</span>, or the × button.
           </p>
         </Section>
 
@@ -204,7 +200,7 @@ window.GTMAutopsy.isOpen();   // → boolean`}
                   label: "Look in the bottom-right corner",
                   body: (
                     <>
-                      Within ~1 second, a <strong style={{ color: "#FFFF6A" }}>yellow pill button</strong> appears in the bottom-right corner of the page. It reads <span className="kbd">★ NEW · Run a free GTM Autopsy →</span>. This is the launcher.
+                      Within ~1 second, a <strong style={{ color: "#FFFF6A" }}>yellow pill button</strong> appears in the bottom-right corner of the page. It reads <span className="kbd">★ NEW · Run a free teardown →</span>. This is the launcher.
                     </>
                   ),
                 },
@@ -212,7 +208,7 @@ window.GTMAutopsy.isOpen();   // → boolean`}
                   label: "Click the launcher",
                   body: (
                     <>
-                      The modal opens over the page. Try the full flow: fill in a sample company (or click <em style={{ color: "#FFFF6A", fontStyle: "normal" }}>/ Try a sample</em>) → press <span className="kbd">RUN AUTOPSY</span> → watch the six-step loading sequence → read the teaser report.
+                      The modal opens over the page. Try the full flow: fill in a sample company (or click <em style={{ color: "#FFFF6A", fontStyle: "normal" }}>/ Try a sample</em>) → press <span className="kbd">RUN TEARDOWN</span> → watch the loading sequence → read the teaser → enter an email to get the full teardown.
                     </>
                   ),
                 },
@@ -251,7 +247,7 @@ window.GTMAutopsy.isOpen();   // → boolean`}
               <ul style={{ listStyle: "none", padding: 0, margin: 0, fontSize: 13.5, color: "rgba(255,255,255,0.85)", lineHeight: 1.65 }}>
                 <li>✓ The launcher button sits in the bottom-right and doesn't overlap any existing UI (nav, chat widget, etc.)</li>
                 <li>✓ Clicking it opens a modal — no layout shift, no broken styles on the host page</li>
-                <li>✓ The form is readable; the loading sequence animates; the report renders within ~10 seconds</li>
+                <li>✓ The form is readable; the loading sequence animates; the teaser and email gate render within ~10 seconds</li>
                 <li>✓ Closing with × / Esc / overlay-click restores the host page exactly as it was</li>
                 <li>✓ The browser console shows no red errors related to <span className="kbd">gtma-*</span> or <span className="kbd">embed.js</span></li>
               </ul>
@@ -301,7 +297,7 @@ window.GTMAutopsy.isOpen();   // → boolean`}
                 Open the demo →
               </a>
               <a
-                href="/widget?cta=https%3A%2F%2Fmyosin.xyz%2Fhivemind%23contact"
+                href="/widget"
                 className="btn-ghost inline-flex items-center"
                 style={{ textDecoration: "none" }}
               >
@@ -377,7 +373,7 @@ font-src   https://fonts.gstatic.com;`}
           </p>
           <div style={{ marginTop: 22, display: "flex", flexWrap: "wrap", gap: 10 }}>
             <a
-              href="mailto:hello@myosin.xyz?subject=GTM%20Autopsy%20widget%20%E2%80%94%20ready%20to%20install"
+              href="mailto:hello@myosin.xyz?subject=GTM%20Teardown%20widget%20%E2%80%94%20ready%20to%20install"
               style={{
                 padding: "13px 22px",
                 borderRadius: 999,
@@ -431,7 +427,7 @@ function TopBar() {
           </span>
           <span style={{ color: "rgba(255,255,255,0.25)", fontFamily: "var(--font-mono-stack)", fontSize: 11 }}>/</span>
           <span style={{ fontFamily: "var(--font-mono-stack)", fontSize: 11, fontWeight: 500, letterSpacing: "0.12em", color: "#fff" }}>
-            GTM AUTOPSY · INSTALL
+            GTM TEARDOWN · INSTALL
           </span>
         </a>
         <div className="hidden items-center gap-4 md:flex">

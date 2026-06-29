@@ -1,0 +1,38 @@
+import { companyNameFromDomain, normalizeDomain } from "./domain";
+import { buildMockReport } from "./mocks";
+import type { AutopsyInput, TeaserV2 } from "./types";
+
+// Deterministic mock v2 shapes for local dev (no HIVEMIND_API_KEY). Reuses the
+// existing mock report generator and projects it onto the grounded v2 shapes so
+// the widget renders identically in mock and live mode.
+
+function inputFor(url: string): AutopsyInput {
+  const domain = normalizeDomain(url) ?? "example.com";
+  // Seed from the canonical domain so buildMockReport (which hashes websiteUrl)
+  // returns the same mock teaser for foo.com, https://foo.com/, www.foo.com, etc.
+  return {
+    companyName: companyNameFromDomain(domain),
+    websiteUrl: `https://${domain}`,
+    category: "other",
+  };
+}
+
+export function mockTeaserV2(url: string): TeaserV2 {
+  const input = inputFor(url);
+  const m = buildMockReport(input);
+  return {
+    overallScore: m.overallScore,
+    verdict: m.verdict,
+    scorecard: m.scorecard,
+    whatsBroken: m.whatsBroken,
+    scan: {
+      projectName: input.companyName,
+      description: "",
+      category: [input.category],
+      socialHandles: {},
+      audiences: [],
+      channels: [],
+      rawText: "",
+    },
+  };
+}

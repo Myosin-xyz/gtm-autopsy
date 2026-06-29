@@ -19,7 +19,7 @@ export async function GET(req: Request) {
 }
 
 function buildScript(origin: string) {
-  return `/* GTM Autopsy embed widget — by Hivemind */
+  return `/* GTM Teardown embed widget — by Hivemind */
 (function () {
   if (window.__gtmAutopsyEmbedLoaded) return;
   window.__gtmAutopsyEmbedLoaded = true;
@@ -29,12 +29,10 @@ function buildScript(origin: string) {
   var d = (script && script.dataset) || {};
 
   var config = {
-    buttonLabel: d.label || 'Run a free GTM Autopsy',
+    buttonLabel: d.label || 'Run a free teardown',
     buttonIcon: d.icon || '',
     position: d.position || 'bottom-right',
     accent: d.accent || '#FFFF6A',
-    cta: d.cta || (location.origin + (location.pathname || '/') + '#contact'),
-    ctaLabel: d.ctaLabel || 'Hire Hivemind →',
     auto: d.auto === 'true',
   };
 
@@ -93,7 +91,7 @@ function buildScript(origin: string) {
     overlay.className = 'gtma-overlay';
     overlay.setAttribute('role', 'dialog');
     overlay.setAttribute('aria-modal', 'true');
-    overlay.setAttribute('aria-label', 'GTM Autopsy');
+    overlay.setAttribute('aria-label', 'GTM Teardown');
 
     var modal = document.createElement('div');
     modal.className = 'gtma-modal';
@@ -107,13 +105,11 @@ function buildScript(origin: string) {
 
     iframe = document.createElement('iframe');
     iframe.className = 'gtma-iframe';
-    iframe.setAttribute('title', 'GTM Autopsy by Hivemind');
+    iframe.setAttribute('title', 'GTM Teardown by Hivemind');
     iframe.setAttribute('loading', 'lazy');
     iframe.setAttribute('referrerpolicy', 'no-referrer-when-downgrade');
-    var params = new URLSearchParams();
-    params.set('cta', config.cta);
-    params.set('label', config.ctaLabel);
-    iframe.src = ORIGIN + '/widget?' + params.toString();
+    iframe.setAttribute('allowtransparency', 'true');
+    iframe.src = ORIGIN + '/widget';
     modal.appendChild(iframe);
 
     overlay.appendChild(modal);

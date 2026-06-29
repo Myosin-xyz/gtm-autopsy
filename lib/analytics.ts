@@ -1,6 +1,7 @@
 "use client";
 import posthog from "posthog-js";
 
+// event keys retain the gtm_autopsy_* prefix for PostHog funnel continuity
 type GtmEvent =
   | "gtm_autopsy_started"
   | "gtm_autopsy_teaser_viewed"

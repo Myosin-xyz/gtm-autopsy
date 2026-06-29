@@ -1,11 +1,11 @@
 import "./globals.css";
 import type { Metadata } from "next";
-import { ibmPlexSans, ibmPlexMono } from "@/lib/fonts";
+import { inter, abcMaxi } from "@/lib/fonts";
 
 export const metadata: Metadata = {
-  title: "GTM Autopsy — HiveMind",
+  title: "GTM Teardown · HiveMind",
   description:
-    "Paste a URL. Get a brutally honest go-to-market teardown — positioning, ICP, narrative, channels, and rewrites — powered by HiveMind personas.",
+    "Paste a URL. Get a brutally honest go-to-market teardown (positioning, ICP, narrative, channels, and rewrites) powered by HiveMind personas.",
 };
 
 export default function RootLayout({
@@ -14,7 +14,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${ibmPlexSans.variable} ${ibmPlexMono.variable}`}>
+    <html lang="en" className={`${inter.variable} ${abcMaxi.variable}`}>
       <body>{children}</body>
     </html>
   );
