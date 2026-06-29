@@ -510,11 +510,11 @@ function WidgetStyles() {
         --font-mono-stack: var(--font-mono), "Courier New", monospace;
         --font-body-stack: var(--font-body), Inter, Arial, sans-serif;
       }
-      /* Transparent throughout so the embedding page supplies the background. */
-      html, body { background: transparent; margin: 0; padding: 0; }
+      /* Solid black (#000) to match the Hivemind landing-page background exactly. */
+      html, body { background: #000; margin: 0; padding: 0; }
       .myo-root {
         min-height: 100vh; display: flex; flex-direction: column;
-        background: transparent; color: var(--myo-white);
+        background: #000; color: var(--myo-white);
         font-family: var(--font-body-stack); position: relative;
       }
       .myo-body { flex: 1; overflow-y: auto; padding: 22px 20px 24px; scrollbar-width: thin; }
