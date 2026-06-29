@@ -8,7 +8,13 @@ const TEASER_STEPS = ["GTM Architect reading your site", "Diagnosing the narrati
 
 const EXAMPLE_URL = "stripe.com";
 
-type Phase = "idle" | "loadingTeaser" | "teaser" | "scanFailed" | "sent";
+type Phase =
+  | "idle"
+  | "loadingTeaser"
+  | "teaser"
+  | "scanFailed"
+  | "sent"
+  | "limitReached";
 
 function errorCopy(err: string): string {
   switch (err) {
@@ -106,6 +112,11 @@ export function WidgetApp() {
       });
       const data = await res.json();
       if (!res.ok || !data.ok) {
+        // One free teardown per email — send them to the upsell, not an inline error.
+        if (data.error === "email_limit_reached") {
+          setPhase("limitReached");
+          return;
+        }
         setError(data.error ?? "capture_failed");
         setPhase("teaser");
         return;
@@ -152,6 +163,9 @@ export function WidgetApp() {
         )}
         {phase === "sent" && (
           <EmailSentScreen email={email} onReset={reset} />
+        )}
+        {phase === "limitReached" && (
+          <LimitReachedScreen email={email} onReset={reset} />
         )}
       </div>
 
@@ -445,6 +459,35 @@ function EmailSentScreen({ email, onReset }: { email: string; onReset: () => voi
         the rewrite, the posts, and the plan.
       </p>
       <button onClick={onReset} className="myo-text-link">/ run another teardown</button>
+    </div>
+  );
+}
+
+function LimitReachedScreen({ email, onReset }: { email: string; onReset: () => void }) {
+  const appUrl =
+    process.env.NEXT_PUBLIC_HIVEMIND_APP_URL?.replace(/\/$/, "") ||
+    "https://hivemind.myosin.xyz";
+  const signupUrl = `${appUrl}/auth/signup?email=${encodeURIComponent(
+    email,
+  )}&utm_source=gtm_autopsy&utm_medium=teardown&utm_campaign=email_limit`;
+  return (
+    <div>
+      <div className="myo-kicker" style={{ color: "var(--myo-pink)" }}>/ ONE FREE TEARDOWN PER EMAIL</div>
+      <h3 className="myo-display" style={{ fontSize: 24 }}>You&apos;ve used your free teardown.</h3>
+      <p className="myo-lead" style={{ margin: "10px 0 18px" }}>
+        {email} already has a teardown on the way. Want to run them on more sites? Create a free
+        Hivemind account to onboard your projects and put the swarm to work on all of them.
+      </p>
+      <a
+        href={signupUrl}
+        target="_top"
+        rel="noopener"
+        className="myo-btn-primary"
+        style={{ display: "block", textDecoration: "none", marginBottom: 10 }}
+      >
+        CREATE A FREE ACCOUNT →
+      </a>
+      <button onClick={onReset} className="myo-text-link">/ start over</button>
     </div>
   );
 }
