@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import type { TeaserV2 } from "@/lib/types";
 import { initAnalytics, track } from "@/lib/analytics";
+import { useIframeAutoHeight } from "./use-iframe-auto-height";
 
 const TEASER_STEPS = ["GTM Architect reading your site", "Diagnosing the narrative", "Scoring against your category"];
 
@@ -36,6 +37,8 @@ function errorCopy(err: string): string {
 }
 
 export function WidgetApp() {
+  useIframeAutoHeight();
+
   const [phase, setPhase] = useState<Phase>("idle");
   const [stepIdx, setStepIdx] = useState(0);
   const [error, setError] = useState<string | null>(null);
@@ -515,6 +518,12 @@ function WidgetStyles() {
         font-family: var(--font-body-stack); position: relative;
       }
       .myo-body { flex: 1; overflow-y: auto; padding: 22px 20px 24px; scrollbar-width: thin; }
+      /* Embedded in a cross-origin iframe (Framer): size to content, not the
+         viewport, so the parent can grow the iframe to fit. No internal scroll —
+         the iframe itself becomes the right height via postMessage. */
+      html[data-embedded], html[data-embedded] body { height: auto; }
+      html[data-embedded] .myo-root { min-height: 0; }
+      html[data-embedded] .myo-body { flex: none; overflow-y: visible; }
       .myo-body::-webkit-scrollbar { width: 6px; }
       .myo-body::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 6px; }
       .myo-kicker { font-family: var(--font-mono-stack); font-size: 10px; letter-spacing: 0.18em; color: rgba(255,255,255,0.45); text-transform: uppercase; margin-bottom: 14px; }
