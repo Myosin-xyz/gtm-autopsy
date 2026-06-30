@@ -25,3 +25,13 @@ export function track(event: GtmEvent, props?: Record<string, unknown>): void {
   if (!ready) return;
   posthog.capture(event, props);
 }
+
+// Identify by email on capture so the widget's anonymous events merge onto the
+// email-person. The widget has no redirect to share a distinct_id with the app,
+// so email is the cross-stack join key: the public teardown page identifies by
+// the same email, and hive-mind aliases email → user.id at signup. Keeps Framer,
+// the widget, and the app as one PostHog person.
+export function identify(email: string): void {
+  if (!ready || !email) return;
+  posthog.identify(email, { email });
+}

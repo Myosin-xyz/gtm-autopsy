@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import type { TeaserV2 } from "@/lib/types";
-import { initAnalytics, track } from "@/lib/analytics";
+import { initAnalytics, track, identify } from "@/lib/analytics";
 import { useIframeAutoHeight } from "./use-iframe-auto-height";
 
 const TEASER_STEPS = ["GTM Architect reading your site", "Diagnosing the narrative", "Scoring against your category"];
@@ -93,6 +93,10 @@ export function WidgetApp() {
     e.preventDefault();
     if (!email.trim() || !teaser) return;
     setError(null);
+    // Key this session's events to the email-person (merges the earlier
+    // anonymous started/teaser events) so the funnel stitches to the user the
+    // teardown page + app later resolve from the same email.
+    identify(email.trim());
     try {
       const res = await fetch("/api/leads", {
         method: "POST",
