@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import type { TeaserV2 } from "@/lib/types";
+import type { TeaserV2, AutopsyScanV2 } from "@/lib/types";
 import { initAnalytics, track } from "@/lib/analytics";
 import { useIframeAutoHeight } from "./use-iframe-auto-height";
+import { parseSseBuffer } from "./sse";
 
 const TEASER_STEPS = ["GTM Architect reading your site", "Diagnosing the narrative", "Scoring against your category"];
 
@@ -12,6 +13,7 @@ const EXAMPLE_URL = "stripe.com";
 type Phase =
   | "idle"
   | "loadingTeaser"
+  | "scanned"
   | "teaser"
   | "scanFailed"
   | "sent"
@@ -44,6 +46,7 @@ export function WidgetApp() {
   const [url, setUrl] = useState("");
   const [email, setEmail] = useState("");
   const [teaser, setTeaser] = useState<TeaserV2 | null>(null);
+  const [scan, setScan] = useState<Partial<AutopsyScanV2> | null>(null);
 
   useEffect(() => {
     initAnalytics();
@@ -61,28 +64,57 @@ export function WidgetApp() {
     e.preventDefault();
     if (!url.trim()) return;
     setError(null);
+    setScan(null);
     setStepIdx(0);
     setPhase("loadingTeaser");
     track("gtm_autopsy_started", { url: url.trim() });
-    const t0 = Date.now();
     try {
-      const res = await fetch("/api/teardown/teaser", {
+      const res = await fetch("/api/teardown/teaser/stream", {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ url: url.trim() }),
       });
-      const data = await res.json();
-      if (!res.ok || !data.teaser) {
+      if (!res.ok || !res.body) {
+        const data = await res.json().catch(() => ({}));
         const err = data.error ?? "scan_failed";
         setError(err);
         setPhase(err === "scan_failed" ? "scanFailed" : "idle");
         return;
       }
-      const elapsed = Date.now() - t0;
-      if (elapsed < 2200) await new Promise((r) => setTimeout(r, 2200 - elapsed));
-      setTeaser(data.teaser as TeaserV2);
-      setPhase("teaser");
-      track("gtm_autopsy_teaser_viewed", { url: url.trim() });
+
+      const reader = res.body.pipeThrough(new TextDecoderStream()).getReader();
+      let buffer = "";
+      let gotTeaser = false;
+
+      for (;;) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buffer += value;
+        const { events, rest } = parseSseBuffer(buffer);
+        buffer = rest;
+        for (const ev of events) {
+          if (ev.event === "scan") {
+            setScan(JSON.parse(ev.data) as Partial<AutopsyScanV2>);
+            setPhase("scanned");
+          } else if (ev.event === "teaser") {
+            setTeaser(JSON.parse(ev.data) as TeaserV2);
+            setPhase("teaser");
+            gotTeaser = true;
+            track("gtm_autopsy_teaser_viewed", { url: url.trim() });
+          } else if (ev.event === "error") {
+            const err =
+              (JSON.parse(ev.data) as { error?: string }).error ?? "scan_failed";
+            setError(err);
+            setPhase(err === "rate_limited" ? "idle" : "scanFailed");
+            return;
+          }
+        }
+      }
+
+      if (!gotTeaser) {
+        setError("scan_failed");
+        setPhase("scanFailed");
+      }
     } catch (err) {
       setError(String(err));
       setPhase("scanFailed");
@@ -133,6 +165,7 @@ export function WidgetApp() {
     setUrl("");
     setEmail("");
     setTeaser(null);
+    setScan(null);
     setStepIdx(0);
     setError(null);
   }
@@ -148,6 +181,9 @@ export function WidgetApp() {
         )}
         {phase === "loadingTeaser" && (
           <LoadingScreen steps={TEASER_STEPS} idx={stepIdx} title="Reading the room." />
+        )}
+        {phase === "scanned" && scan && (
+          <ScanRevealScreen scan={scan} />
         )}
         {phase === "teaser" && teaser && (
           <TeaserScreen
@@ -297,6 +333,66 @@ function LoadingScreen({ steps, idx, title }: { steps: string[]; idx: number; ti
           );
         })}
       </ol>
+    </div>
+  );
+}
+
+function Chips({ label, items }: { label: string; items?: string[] }) {
+  if (!items || items.length === 0) return null;
+  return (
+    <div style={{ marginTop: 16 }}>
+      <div className="myo-card-label">{label}</div>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 10 }}>
+        {items.slice(0, 6).map((it, i) => (
+          <span
+            key={i}
+            style={{
+              fontFamily: "var(--font-mono-stack)",
+              fontSize: 12,
+              color: "rgba(255,255,255,0.85)",
+              border: "1px solid rgba(255,255,255,0.16)",
+              borderRadius: 999,
+              padding: "5px 12px",
+            }}
+          >
+            {it}
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// Shown the moment the `scan` event lands: real, grounded facts about the site
+// while the diagnosis (score / what's broken) is still running.
+function ScanRevealScreen({ scan }: { scan: Partial<AutopsyScanV2> }) {
+  const company = scan.projectName || "your site";
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+      <div className="myo-card">
+        <div className="myo-card-label" style={{ color: "var(--myo-lime)" }}>
+          / We read {company}
+        </div>
+        {scan.description && (
+          <p style={{ margin: "10px 0 0", fontSize: 17, color: "#fff", lineHeight: 1.5 }}>
+            {scan.description}
+          </p>
+        )}
+        <Chips label="/ Category" items={scan.category} />
+        <Chips label="/ Who you're talking to" items={scan.audiences} />
+        <Chips label="/ Channels" items={scan.channels} />
+      </div>
+
+      <div
+        className="myo-kicker"
+        style={{ color: "var(--myo-pink)", display: "flex", alignItems: "center", gap: 8, margin: 0 }}
+      >
+        <span className="myo-pulse-dot" />
+        / Diagnosing your GTM&hellip;
+      </div>
+      <div style={{ height: 2, width: "100%", background: "rgba(255,255,255,0.08)", overflow: "hidden" }}>
+        <div className="myo-shimmer-bar" />
+      </div>
     </div>
   );
 }
